@@ -1,3 +1,13 @@
+<?php
+
+/* * TODO :
+-titre page
+-(uniquement si plusieurs liens) > fonction javascript
+- améliorer dans download la manière dont sont exécutées les commandes + prendre en compte les timers
+- écrire note en haut de page sur comme se servir du timer
+*/
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
     <head>
@@ -11,6 +21,58 @@
                 right: 20px;
                 display: none;
             }
+
+            .timer, .isOpened
+            {
+                width: 38px;
+                height: 38px;
+                border: 2px solid #ff1f00;
+                transition: transform 0.2s;
+            }
+            .timer:hover, .isOpened:hover
+            {
+                cursor: pointer;
+                transform: translateY(-5px);
+            }
+            .btn
+            {
+                transition: transform 0.2s;
+            }
+            .btn:hover
+            {
+                transform: translateY(-5px);
+            }
+
+            #inputFormRow, #inputFormRowOff
+            {
+                margin-right: 15px;
+            }
+            .timerSelect
+            {
+                display: flex;
+            }
+
+            .timerSelectInput
+            {
+                border: 1px solid gray;
+                padding: 5px;
+            }
+
+
+            .timerInputFin
+            {
+                float: right;
+            }
+            
+
+            .timerInputInput
+            {
+                width: 96px;
+                padding-left: 4px;
+                padding-right: 4px;
+            }
+
+
         </style>
     </head>
     <body>
@@ -22,13 +84,16 @@
         <i class="fas fa-arrow-up"></i>
         </button>
         <h1> Outil de telechargement de vidéos youtube</h1>
-        <form action="download.php" method="post" style="margin-top: 15px; margin-left: 15px;">
+        <form id="form" action="download.php" method="post" style="margin-top: 15px; margin-left: 15px;">
             <div id="inputFormRowOff">
                 <div class="input-group mb-3">
                     <input type="text" name="title[]" class="form-control m-input" placeholder="Entrer URL" autocomplete="off" required>
+                    <div class="timerSelect">
+                        <img class="timer" src="img/timer.jpg" alt="Timer">
+                    </div>
+                    <button id="addRow" type="button" class="btn btn-info">Ajouter un lien</button>
                 </div>
             </div>
-            <button id="addRow" type="button" class="btn btn-info">Ajouter un lien</button>
             <div id="newRow"></div>
             <div>
                 <input type="radio" id="mptrois" name="type" value="mptrois"
@@ -82,13 +147,13 @@
                     </div>
                 </div>
             </div>
-            <h4> Renommez si vous le souhaitez le dossier et l'archive qui contiendront vos téléchargements (uniquement si plusieurs liens) </h4>
+            <h4> Renommez si vous le souhaitez le dossier qui contiendra vos téléchargements (uniquement si plusieurs liens) </h4>
             <input type="text" id="rename" name="rename" class="form-control m-input" placeholder="renommez" autocomplete="off" disabled>
             <fieldset>
-                <legend>Conserver l'ordre des liens lors du téléchargement ? (uniquement si plusieurs liens)</legend>
+                <legend>Mettre les fichiers téléchargés dans le même ordre que les liens youtube ? (uniquement si plusieurs liens)</legend>
                 <div>
                     <input type="checkbox" id="ordre" name="ordre" checked disabled>
-                    <label for="ordre">Coché pour oui, décoché pour non</label>
+                    <label for="ordre">Coché pour oui, décoché pour non. Si case décochée (non) les fichiers seront dans l'ordre alphabétique.</label>
                 </div>
             </fieldset>
             <input type="submit" name="submit" value="TELECHARGER" style="background-color: #1a53ff; color: white; border-radius: 6px; padding: 5px; padding-left: 12px; padding-right: 12px; cursor: pointer;">
@@ -114,11 +179,13 @@
         html += '<div id="inputFormRow">';
         html += '<div class="input-group mb-3">';
         html += '<input type="text" name="title[]" class="form-control m-input" placeholder="Entrer URL" autocomplete="off">';
+        html += '<div class="timerSelect"><img class="timer" src="img/timer.jpg" alt="Timer"></div>';
         html += '<div class="input-group-append">';
         
         html += '<button id="removeRow" type="button" class="btn btn-danger">Supprimer</button>';
         html += '</div>';
         html += '</div>';
+
 
         $('#newRow').append(html);
         $("#rename").prop('disabled', false);
@@ -166,14 +233,50 @@
         $("#ordre").prop('disabled', true);
     });
 
-    /*while(1)
-    {
-        if($("#inputFormRow").length == 0) 
-        {
-            $("#rename").prop('disabled', true);
-            $("#ordre").prop('disabled', true);
-        }
-    }*/
+    //timer
+    $(document).on('click', '.timer', function() {
+
+        const $closest = $(this).closest('.timerSelect');
+        var setTimer = '';
+        $closest.empty();
+        setTimer += '<div class="timerSelectInput">';
+            setTimer += '<div class="timerInput">';
+                setTimer += 'Debut ';
+                setTimer += '<input type="text" class="timerInputInput" name="posTimer[]" placeholder="" autocomplete="off" required>';
+            setTimer += '</div>';
+            setTimer += '<div class="timerInput">';
+                setTimer += 'Fin ';
+                setTimer += '<input type="text" class="timerInputInput timerInputFin" name="posTimer[]" placeholder="" autocomplete="off" required>';
+            setTimer += '</div>';
+        setTimer += '</div>';
+        setTimer += '<img class="isOpened" src="img/timerCloseEdit.png" alt="Timer">';
+
+        $closest.append(setTimer);
+    });
+
+        //timer close
+        $(document).on('click', '.isOpened', function() {
+            const $closest = $(this).closest('.timerSelect');
+            var setTimer = '';
+            $closest.empty();
+            setTimer += '<img class="timer" src="img/timer.jpg" alt="Timer">';
+            $closest.append(setTimer);
+        });
+
+    $('#form').submit(function() {
+        var timerSelectElements = [];
+        $('.timerSelect').each(function(index) {
+          if ($(this).children('.timerSelectInput').length > 0) {
+            timerSelectElements.push(index);
+          }
+        });
+        var timerSelectElementsString = JSON.stringify(timerSelectElements);
+        $('<input>').attr({
+        type: 'hidden',
+        name: 'timerSelectElements',
+        value: timerSelectElementsString
+        }).appendTo('#form');
+    });
 
 
     //Get the button

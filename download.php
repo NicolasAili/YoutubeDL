@@ -2,8 +2,12 @@
 $type = $_POST['type'];
 $format = $_POST['format'];
 $title = $_POST['title'];
+$posTimer = $_POST['posTimer']; //récupère les sections debut et fin
+$timerSelectElements = $_POST['timerSelectElements']; //récupère les liens concernés
 $rename = $_POST['rename'];
 $ordre = $_POST['ordre'];
+
+$whatTimer  = 0; //tracker pour les timers
 
 if(sizeof($title)>1)
 {
@@ -23,7 +27,7 @@ else
     if($rename)
     {
         ?><a href="url.php"> retour </a><br><?php
-        exit('impossible d\'avoir un renommage si un seul lien');
+        exit('impossible d\'avoir un renommage du dossier si un seul lien');
     }
 }
 
@@ -35,22 +39,33 @@ switch ($type) {
             {
                 if ($format == 'best') 
                 {
-                    exec('cd ' . $renamedir . '&& yt-dlp -x ' . $title[$i], $output, $retval); //telecharge uniquement l'audio
+                    //exec('cd ' . $renamedir . '&& yt-dlp -x ' . $title[$i], $output, $retval); //telecharge uniquement l'audio 
+
+                    //si i = timerSelectElements[whattimer/2]
+                        //alors on telecharge la video avec debut posTimer[whattimer] et fin posTimer[whattimer + 1] 
+                        //whattimer = whattimer+2
                 }
                 else
                 {
-                    exec('cd ' . $renamedir . '&& yt-dlp -x --audio-format ' . $format . ' ' . $title[$i], $output, $retval); //telecharge uniquement l'audio
+                    exec('cd ' . $renamedir . '&& yt-dlp -x --audio-format ' . $format . ' ' . $title[$i], $output, $retval); //telecharge uniquement l'audio selon le format désiré
                 }
             }
             else
             {
                 if ($format == 'best') 
                 {
-                    exec('yt-dlp -x ' . $title[$i], $output, $retval); //telecharge uniquement l'audio
+                    //yt-dlp https://www.youtube.com/watch?v=7guNNC2QEKo --download-sections *0:15-0:42
+                    //exec('yt-dlp -x ' . $title[$i] . ' --download-sections *0:01-0:41', $output, $retval); //telecharge uniquement l'audio
+                    //exec('yt-dlp -x ' . $title[$i], $output, $retval); //telecharge uniquement l'audio
+                    /*echo 'yt-dlp -x ' . $title[$i] . ' --download-sections *0:01-0:41';
+                    echo '<br>';
+                    print_r($output);
+                    echo '<br>';
+                    echo $retval;*/
                 }
                 else
                 {
-                    exec('yt-dlp -x --audio-format ' . $format . ' ' . $title[$i], $output, $retval); //telecharge uniquement l'audio
+                    exec('yt-dlp -x --audio-format ' . $format . ' ' . $title[$i], $output, $retval); //telecharge uniquement l'audio selon le format désiré
                 }
             }
             if($i == 0)
@@ -129,11 +144,11 @@ switch ($type) {
                 }
                 $restarr[$i] = $j . ' - ' . $restarr[$i]; //on met au format "numero - nomfichier"
 
-                rename ($renamedir . '/' . $restarrcp, $renamedir . '/' . $restarr[$i]); //on renomme
+                rename ($renamedir . '/' . $restarrcp, $renamedir . '/' . $restarr[$i]); //on renomme sur le disque
             }
             elseif(sizeof($title)==1)  
             {
-                rename ($restarrcp, $restarr[$i]); //on renomme
+                rename ($restarrcp, $restarr[$i]); //on renomme sur le disque
             }
         }
         break;
@@ -265,7 +280,7 @@ else
 }
 
 
-if (file_exists($rest)) { //télécharge le fichier
+/*if (file_exists($rest)) { //télécharge le fichier
     header('Content-Description: File Transfer');
     header('Content-Type: application/octet-stream');
     header('Content-Disposition: attachment; filename="'.basename($rest).'"');
@@ -278,7 +293,7 @@ if (file_exists($rest)) { //télécharge le fichier
 else //erreur
 {
     echo "erreur, un bug est apparu, pas de chance :/";
-}
+}*/
 
 $rest = str_replace(" ", "\ ", $rest); //supprime les espaces car ça fait buguer la suppression
 
