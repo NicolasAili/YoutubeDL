@@ -242,11 +242,11 @@
         setTimer += '<div class="timerSelectInput">';
             setTimer += '<div class="timerInput">';
                 setTimer += 'Debut ';
-                setTimer += '<input type="text" class="timerInputInput" name="posTimer[]" placeholder="" autocomplete="off" required>';
+                setTimer += '<input type="text" class="timerInputInput" name="posTimer[]" placeholder="" autocomplete="off">';
             setTimer += '</div>';
             setTimer += '<div class="timerInput">';
                 setTimer += 'Fin ';
-                setTimer += '<input type="text" class="timerInputInput timerInputFin" name="posTimer[]" placeholder="" autocomplete="off" required>';
+                setTimer += '<input type="text" class="timerInputInput timerInputFin" name="posTimer[]" placeholder="" autocomplete="off">';
             setTimer += '</div>';
         setTimer += '</div>';
         setTimer += '<img class="isOpened" src="img/timerCloseEdit.png" alt="Timer">';
@@ -264,9 +264,9 @@
         });
 
     $('#form').submit(function() {
-        var timerSelectElements = [];
-        $('.timerSelect').each(function(index) {
-          if ($(this).children('.timerSelectInput').length > 0) {
+        var timerSelectElements = []; //créé le tableau
+        $('.timerSelect').each(function(index) { //parcours tous les timers
+          if ($(this).children('.timerSelectInput').length > 0) { //si on a renseingé des temps alors on les ajoute
             timerSelectElements.push(index);
           }
         });

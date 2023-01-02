@@ -2,10 +2,59 @@
 $type = $_POST['type'];
 $format = $_POST['format'];
 $title = $_POST['title'];
+
 $posTimer = $_POST['posTimer']; //récupère les sections debut et fin
 $timerSelectElements = $_POST['timerSelectElements']; //récupère les liens concernés
+
 $rename = $_POST['rename'];
 $ordre = $_POST['ordre'];
+
+
+print_r($timerSelectElements);
+ echo "<br>";
+ echo "-----------------------------------------------------";
+  echo "<br>";
+  echo "<br>";
+
+$tabelements = [];
+$j = 0;
+
+for ($i=0; $i < sizeof($title); $i++) 
+{
+    echo $i;
+    echo "<br>";
+    echo $j;
+    echo "<br>";
+    echo $timerSelectElements[$j];
+    echo "<br>";
+
+    if($i == $timerSelectElements[$j])
+    {
+        echo "trouvé!";
+        echo "<br>";
+        if (empty($posTimer[2*$i])) { //à partir du début de la vidéo
+            $tabelements[2*$i] == '00:00';
+        } 
+        else if (empty($posTimer[2*$i+1])) { //jusqu'à la fin
+            //--get-duration 
+            $tabelements[2*$i+1] == 'fin';
+        }
+        else
+        {
+            $tabelements[2*$i] = $posTimer[2*$j];
+            $tabelements[2*$i+1] = $posTimer[2*$j+1];
+        }
+        $j++;
+    }
+    else
+    {
+        $tabelements[2*$i] = null;
+        $tabelements[2*$i+1] = null;
+    }
+    echo "_____________";
+    echo "<br>";
+}    
+
 
 $whatTimer  = 0; //tracker pour les timers
 
