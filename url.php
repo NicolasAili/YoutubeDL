@@ -270,12 +270,14 @@
             timerSelectElements.push(index);
           }
         });
-        var timerSelectElementsString = JSON.stringify(timerSelectElements);
-        $('<input>').attr({
-        type: 'hidden',
-        name: 'timerSelectElements',
-        value: timerSelectElementsString
-        }).appendTo('#form');
+
+        for (var i = 0; i < timerSelectElements.length; i++) {
+          $('<input>').attr({
+            type: 'hidden',
+            name: 'timerSelectElements[]',
+            value: timerSelectElements[i]
+          }).appendTo('#form');
+        }
     });
 
 
