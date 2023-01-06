@@ -266,18 +266,18 @@
     $('#form').submit(function() {
         var timerSelectElements = []; //créé le tableau
         $('.timerSelect').each(function(index) { //parcours tous les timers
-          if ($(this).children('.timerSelectInput').length > 0) { //si on a renseingé des temps alors on les ajoute
+          if ($(this).children('.timerSelectInput').length > 0) { //si on a renseigné des temps alors on les ajoute
             timerSelectElements.push(index);
           }
         });
-
         for (var i = 0; i < timerSelectElements.length; i++) {
           $('<input>').attr({
             type: 'hidden',
-            name: 'timerSelectElements[]',
+            name: 'selectedElements[]',
             value: timerSelectElements[i]
           }).appendTo('#form');
         }
+        //event.preventDefault();
     });
 
 
