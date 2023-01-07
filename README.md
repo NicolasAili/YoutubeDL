@@ -2,7 +2,7 @@
 
 Obligatoire pour que l'outil fonctionne :
 
--Apache2
+- Apache2
 - PHP7 ou supérieur
 - yt-dlp ----> https://github.com/yt-dlp/yt-dlp#installation
 - ffmpeg et ffprobe (généralement déjà installés)
