@@ -83,7 +83,12 @@
             >
         <i class="fas fa-arrow-up"></i>
         </button>
-        <h1> Outil de telechargement de vidéos youtube</h1>
+        <div style="margin-top: 30px; margin-left: 15px;">
+            <h1> Outil de telechargement de vidéos youtube</h1>
+            <h4> Note : pour télécharger seulement une partie d'une vidéo, cliquez sur la pendule puis renseignez le début et la fin de la section que vous souhaitez télécharger. Si la section commence au début de la vidéo, ou termine à la fin de la vidéo, ne mettez rien dans les champs Debut/Fin (en fonction de votre situation) </h4>
+            <h4 style="background-color: red; display: inline;"> Format pour les champs "debut" et "fin" : HH:MM:SS OU MM:SS OU SS </h4>
+            <h4> Exemples : 01:05:22 pour 1 heure 5 minutes 22 secondes, 05:25 pour 5 minutes 25, 04 pour 4 secondes </h4>
+        </div>
         <form id="form" action="download.php" method="post" style="margin-top: 15px; margin-left: 15px;">
             <div id="inputFormRowOff">
                 <div class="input-group mb-3">
@@ -148,9 +153,9 @@
                 </div>
             </div>
             <h4> Renommez si vous le souhaitez le dossier qui contiendra vos téléchargements (uniquement si plusieurs liens) </h4>
-            <input type="text" id="rename" name="rename" class="form-control m-input" placeholder="renommez" autocomplete="off" disabled>
+            <input type="text" id="rename" name="rename" class="form-control m-input" autocomplete="off" disabled>
             <fieldset>
-                <legend>Mettre les fichiers téléchargés dans le même ordre que les liens youtube ? (uniquement si plusieurs liens)</legend>
+                <legend>Cochez cette case pour garder l'ordre des liens lors du téléchargement tels que vous les avez renseignés (uniquement si plusieurs liens)</legend>
                 <div>
                     <input type="checkbox" id="ordre" name="ordre" checked disabled>
                     <label for="ordre">Coché pour oui, décoché pour non. Si case décochée (non) les fichiers seront dans l'ordre alphabétique.</label>
@@ -189,6 +194,7 @@
 
         $('#newRow').append(html);
         $("#rename").prop('disabled', false);
+        $("#rename").attr("placeholder", "Renommez");
         $("#ordre").prop('disabled', false);
     });
 
@@ -198,6 +204,8 @@
         if($("#inputFormRow").length == 0)
         {
             $("#rename").prop('disabled', true);
+            $("#rename").attr("placeholder", "");
+            $("#rename").val('');
             $("#ordre").prop('disabled', true);
         }
     });
@@ -264,6 +272,7 @@
         });
 
     $('#form').submit(function() {
+        $("[name='selectedElements[]']").remove();
         var timerSelectElements = []; //créé le tableau
         $('.timerSelect').each(function(index) { //parcours tous les timers
           if ($(this).children('.timerSelectInput').length > 0) { //si on a renseigné des temps alors on les ajoute
@@ -277,7 +286,6 @@
             value: timerSelectElements[i]
           }).appendTo('#form');
         }
-        //event.preventDefault();
     });
 
 

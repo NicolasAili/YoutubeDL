@@ -2,28 +2,22 @@
 $type = $_POST['type'];
 $format = $_POST['format'];
 $title = $_POST['title'];
+$rename = $_POST['rename'];
+$ordre = $_POST['ordre'];
 
 $posTimer = $_POST['posTimer']; //récupère les sections debut et fin
 $selectedElements = $_POST['selectedElements']; //récupère les liens concernés
 
-$rename = $_POST['rename'];
-$ordre = $_POST['ordre'];
-
-echo "selectedelements : ";
-print_r($selectedElements);
-echo "<br>";
-echo "timers : ";
-print_r($posTimer);
-echo "<br>";
-
-
-
 $tabelements = [];
 $j = 0;
 
+/*print_r($selectedElements);
+echo "<br>";
+print_r($posTimer);
+echo "<br>";*/
+
 for ($i=0; $i < sizeof($title); $i++) 
 {
-
     if($i == $selectedElements[$j])
     {
         if(empty($posTimer[2*$j]) && empty($posTimer[2*$j+1]))
@@ -37,6 +31,13 @@ for ($i=0; $i < sizeof($title); $i++)
         } 
         else if (empty($posTimer[2*$j+1])) { //jusqu'à la fin
             exec('yt-dlp ' . $title[$i] . ' --get-duration', $output);
+
+            $pos = strpos($output[0], ':');
+
+            if ($pos === false) {
+                $output[0] = '00:' . $output[0];
+            }
+
             $tabelements[2*$i] = $posTimer[2*$j];
             $tabelements[2*$i+1] = $output[0];
         }
@@ -52,14 +53,10 @@ for ($i=0; $i < sizeof($title); $i++)
         $tabelements[2*$i] = null;
         $tabelements[2*$i+1] = null;
     }
-}    
+}
 
-echo "tableau final : ";
-print_r($tabelements);
-echo "<br>";
-echo "____________________________________________";
-echo "<br>";
-echo "<br>";
+/*print_r($tabelements);
+echo "<br>";*/
 
 if(sizeof($title)>1)
 {
@@ -79,7 +76,7 @@ else
     if($rename)
     {
         ?><a href="url.php"> retour </a><br><?php
-        exit('impossible d\'avoir un renommage du dossier si un seul lien');
+        exit('impossible d\'avoir un renommage si un seul lien');
     }
 }
 
@@ -91,101 +88,99 @@ switch ($type) {
             {
                 if ($format == 'best') 
                 {
-                    echo "cas 1";
-                    echo "<br>";
                     if(!empty($tabelements[2*$i]))
                     {
-                        exec('cd ' . $renamedir . '&& yt-dlp -x ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1], $output, $retval); 
+                        /*echo "i inside timer: " . $i;
+                        echo "<br>";*/
+                        exec('cd ' . $renamedir . ' && yt-dlp -x ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts', $output, $retval);
+                        /*echo 'cd ' . $renamedir . ' && yt-dlp -x ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts';
+                        echo "<br>";*/
                     }
                     else
                     {
-                        exec('cd ' . $renamedir . '&& yt-dlp -x ' . $title[$i], $output, $retval); //telecharge uniquement l'audio 
+                        /*echo "i inside no timer: " . $i;
+                        echo "<br>";*/
+                        exec('cd ' . $renamedir . ' && yt-dlp -x ' . $title[$i], $output, $retval); //telecharge uniquement l'audio 
+                        /*echo 'cd ' . $renamedir . ' && yt-dlp -x ' . $title[$i];
+                        echo "<br>";*/
                     }
                 }
                 else
                 {
-                    echo "cas 2";
-                    echo "<br>";
-                    echo "i : ";
-                    echo "$i";
-                    echo "<br>";
-                    echo "tabelements[2*$i] : ";
-                    echo $tabelements[2*$i];
-                    echo "<br>";
                     if(!empty($tabelements[2*$i]))
                     {
-                        exec('cd ' . $renamedir . '&& yt-dlp -x --audio-format ' . $format . ' ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1], $output, $retval);
+                        exec('cd ' . $renamedir . ' && yt-dlp -x --audio-format ' . $format . ' ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts', $output, $retval); 
                     }
                     else
                     {
-                        exec('cd ' . $renamedir . '&& yt-dlp -x --audio-format ' . $format . ' ' . $title[$i], $output, $retval); //telecharge uniquement l'audio selon le format désiré
+                        exec('cd ' . $renamedir . ' && yt-dlp -x --audio-format ' . $format . ' ' . $title[$i], $output, $retval); //telecharge uniquement l'audio
                     }
-                    echo "----------------------------------------";
-                    echo "<br>";
                 }
             }
             else
             {
-
                 if ($format == 'best') 
                 {
-                    echo "cas 3";
-                    echo "<br>";
                     if(!empty($tabelements[2*$i]))
                     {
-                        echo "timer";
-                        echo "<br>";
-                        exec('yt-dlp -x ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1], $output, $retval); 
-                        echo 'yt-dlp -x ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1];
-                        echo "<br>";
+                        exec('yt-dlp -x ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts', $output, $retval); 
                     }
                     else
                     {
-                        echo "notimer";
-                        echo "<br>";
                         exec('yt-dlp -x ' . $title[$i], $output, $retval); //telecharge uniquement l'audio
-                        echo 'yt-dlp -x ' . $title[$i];
-                    } 
+                    }
                 }
                 else
                 {
-                    echo "cas 4";
                     if(!empty($tabelements[2*$i]))
                     {
-                        exec('yt-dlp -x --audio-format ' . $format . ' ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1], $output, $retval); 
+                        exec('yt-dlp -x --audio-format ' . $format . ' ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts', $output, $retval); 
                     }
                     else
                     {
-                        exec('yt-dlp -x --audio-format ' . $format . ' ' . $title[$i], $output, $retval); //telecharge uniquement l'audio selon le format désiré
+                        exec('yt-dlp -x --audio-format ' . $format . ' ' . $title[$i], $output, $retval); //telecharge uniquement l'audio
                     }
+                    
                 }
             }
             if($i == 0)
             {
-                $slice = 5;
                 if(!empty($tabelements[2*$i]))
                 {
-                    $slice = 7;
+                    if (sizeof($title)==1) {
+                        $slice = 7;
+                    }
+                    else
+                    {
+                        $slice = 8;
+                    }
+                }
+                else
+                {
+                   $slice = 6; 
                 }
             }
             else
             {
-                $slice = $slice + 7;
+                if(!empty($tabelements[2*$i]))
+                {
+                    $slice = $slice + 9;
+                }
+                else
+                {
+                   $slice = $slice + 8;
+                }
             }
-            print_r($output);
-            echo "<br>";
-            echo "<br>";
             $input = array_slice($output, $slice, 1);  //récupère la partie de la réponse à la commande où se trouve le nom du fichier
+
             $rest = implode("','",$input); //la convertit en une chaîne
-            echo $rest;
+            /*print_r($output);
             echo "<br>";
+            echo "slice : " . $slice;
+            echo "<br>";
+            echo "rest : " . $rest;
+            echo "<br>";*/
             $restarr[$i] = substr($rest, 28); //récupère uniquement le nom du fichier
-            echo "________________________________________________________________________________________________";
-            echo "<br>";
-            echo $restarr[$i];
-            echo "<br>";
-            echo "________________________________________________________________________________________________";
-            echo "<br>";
             $restarrcp = $restarr[$i]; //on garde le nom original (nom du fichier)
             $find = 0; //0 = 3 caractères pour l'extension, 1=4, 2=6
             $pos = strpos($restarr[$i], 'flac');
@@ -249,12 +244,25 @@ switch ($type) {
                     $j = strval($i); //sinon juste 10,11,12...
                 }
                 $restarr[$i] = $j . ' - ' . $restarr[$i]; //on met au format "numero - nomfichier"
-
-                rename($renamedir . '/' . $restarrcp, $renamedir . '/' . $restarr[$i]); //on renomme sur le disque
+                rename ($renamedir . '/' . $restarrcp, $renamedir . '/' . $restarr[$i]); //on renomme
+                /*echo "i : ";
+                echo $i;
+                echo "<br>";
+                echo "j :";
+                echo $j;
+                echo "<br>";
+                echo "restarr i :";
+                echo "<br>";
+                echo $renamedir . '/' . $restarrcp;
+                echo "<br>";
+                echo $renamedir . '/' . $restarr[$i];
+                echo "<br>";
+                echo "------------------------------------------------------------------------------------------------------------------------------------------------";
+                echo "<br>";*/
             }
             elseif(sizeof($title)==1)  
             {
-                rename($restarrcp, $restarr[$i]); //on renomme sur le disque
+                rename ($restarrcp, $restarr[$i]); //on renomme
             }
         }
         break;
@@ -268,22 +276,22 @@ switch ($type) {
                 {
                     if(!empty($tabelements[2*$i]))
                     {
-                        exec('cd ' . $renamedir . '&& yt-dlp ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1], $output, $retval); 
+                        exec('cd ' . $renamedir . ' && yt-dlp ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts', $output, $retval); 
                     }
                     else
                     {
-                        exec('cd ' . $renamedir . '&& yt-dlp ' . $title[$i], $output, $retval); //telecharge la video (et l'audio)
+                        exec('cd ' . $renamedir . ' && yt-dlp ' . $title[$i], $output, $retval); //telecharge la video (et l'audio)
                     }
                 }
                 else
                 {
                     if(!empty($tabelements[2*$i]))
                     {
-                        exec('cd ' . $renamedir . '&& yt-dlp -f ' . $format . ' ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1], $output, $retval); 
+                        exec('cd ' . $renamedir . ' && yt-dlp -f ' . $format . ' ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts', $output, $retval); 
                     }
                     else
                     {
-                        exec('cd ' . $renamedir . '&& yt-dlp -f ' . $format . ' ' . $title[$i], $output, $retval); //telecharge la video (et l'audio)
+                        exec('cd ' . $renamedir . ' && yt-dlp -f ' . $format . ' ' . $title[$i], $output, $retval); //telecharge la video (et l'audio)
                     }
                 }
             }
@@ -293,7 +301,7 @@ switch ($type) {
                 {
                     if(!empty($tabelements[2*$i]))
                     {
-                        exec('yt-dlp ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1], $output, $retval); 
+                        exec('yt-dlp ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts', $output, $retval); 
                     }
                     else
                     {
@@ -304,7 +312,7 @@ switch ($type) {
                 {
                     if(!empty($tabelements[2*$i]))
                     {
-                        exec('yt-dlp -f ' . $format . ' ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1], $output, $retval); 
+                        exec('yt-dlp -f ' . $format . ' ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts', $output, $retval); 
                     }
                     else
                     {
@@ -395,7 +403,7 @@ switch ($type) {
         break;
 }
 
-if(sizeof($title)>1) //crée l'archive où seront stockés les fichiers téléchargés
+if(sizeof($title)>1)
 {
     if($rename)
     {
@@ -413,6 +421,11 @@ else
     $rest = $restarr[0];
 }
 
+
+/*echo "filename : ";
+echo $rest;
+echo "<br>";*/
+
 if (file_exists($rest)) { //télécharge le fichier
     header('Content-Description: File Transfer');
     header('Content-Type: application/octet-stream');
@@ -423,16 +436,17 @@ if (file_exists($rest)) { //télécharge le fichier
     header('Content-Length: ' . filesize($rest));
     readfile($rest);
 }
-else //erreur
+else
 {
     echo "erreur, un bug est apparu, pas de chance :/";
 }
+
 
 $rest = str_replace(" ", "\ ", $rest); //supprime les espaces car ça fait buguer la suppression
 
 exec('yes | rm ' . $rest); //supprime le fichier
 
-if(sizeof($title)>1) //supprime l'archive si plusieurs fichiers
+if(sizeof($title)>1)
 {
     if($rename)
     {
@@ -443,5 +457,5 @@ if(sizeof($title)>1) //supprime l'archive si plusieurs fichiers
         exec('yes | rm -r contenu'); //supprime les fichiers
     }
 }
-?> 
+?>
 <a href="url.php"> retour </a>
