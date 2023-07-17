@@ -11,6 +11,23 @@ $selectedElements = $_POST['selectedElements']; //récupère les liens concerné
 $tabelements = [];
 $j = 0;
 
+
+/*Cette partie supprime les liens ayant été mis plusieurs fois*/
+$uniqueValues = array();
+foreach ($title as $key => $value) {
+    // Check if the value has already occurred in the array
+    if (in_array($value, $uniqueValues)) {
+        // If the value is a duplicate, remove it from the array
+        unset($title[$key]);
+    } else {
+        // If the value is unique, add it to the $uniqueValues array
+        $uniqueValues[] = $value;
+    }
+}
+// Re-index the array after removing duplicates
+$title = array_values($title);
+
+
 /*print_r($selectedElements);
 echo "<br>";
 print_r($posTimer);
@@ -102,6 +119,11 @@ switch ($type) {
                         echo "<br>";*/
                         exec('cd ' . $renamedir . ' && yt-dlp -x ' . $title[$i], $output, $retval); //telecharge uniquement l'audio 
                         /*echo 'cd ' . $renamedir . ' && yt-dlp -x ' . $title[$i];
+                        echo "<br>";
+                        echo "<br>";
+                        print_r($output);
+                        echo "<br>";
+                        echo "__________________________________________________________________________";
                         echo "<br>";*/
                     }
                 }
@@ -114,6 +136,7 @@ switch ($type) {
                     else
                     {
                         exec('cd ' . $renamedir . ' && yt-dlp -x --audio-format ' . $format . ' ' . $title[$i], $output, $retval); //telecharge uniquement l'audio
+                        //echo 'cd ' . $renamedir . ' && yt-dlp -x --audio-format ' . $format . ' ' . $title[$i];
                     }
                 }
             }
@@ -157,30 +180,35 @@ switch ($type) {
                 }
                 else
                 {
-                   $slice = 6; 
+                   $slice = 8;
                 }
             }
             else
             {
                 if(!empty($tabelements[2*$i]))
                 {
-                    $slice = $slice + 9;
+                    $slice = $slice + 10;
                 }
                 else
                 {
-                   $slice = $slice + 8;
+                   $slice = $slice + 10;
                 }
             }
             $input = array_slice($output, $slice, 1);  //récupère la partie de la réponse à la commande où se trouve le nom du fichier
 
             $rest = implode("','",$input); //la convertit en une chaîne
+            $restarr[$i] = substr($rest, 28); //récupère uniquement le nom du fichier
             /*print_r($output);
+            echo '<br>';
             echo "<br>";
             echo "slice : " . $slice;
             echo "<br>";
             echo "rest : " . $rest;
-            echo "<br>";*/
-            $restarr[$i] = substr($rest, 28); //récupère uniquement le nom du fichier
+            echo "<br>";
+            echo $restarr[$i];
+            echo '<br>';
+            echo "__________________________________________________________";
+            echo '<br>';*/
             $restarrcp = $restarr[$i]; //on garde le nom original (nom du fichier)
             $find = 0; //0 = 3 caractères pour l'extension, 1=4, 2=6
             $pos = strpos($restarr[$i], 'flac');
@@ -230,8 +258,15 @@ switch ($type) {
                     echo "find inconnu"; //erreur
                 break;
             }
-            
             $restarr[$i] = $restarr[$i] . $extension; //rajoute l'extension
+            /*echo "extension : " . $extension;
+            echo "<br>";
+            echo "apres modifs : " . $restarr[$i];
+            echo "<br>";
+            echo "unification : " . $restarr[$i];
+            echo "<br>";
+            echo "_______________________________________";
+            echo "<br>";*/
             
             if(sizeof($title)>1 && isset($ordre)) //si plus d'un fichier et qu'on veut conserver l'ordre
             {
@@ -325,31 +360,50 @@ switch ($type) {
             {
                 if($i == 0)
                 {
-                    $slice = 7;
+                    $slice = 10;
                 }
                 else
                 {
-                    $slice = $slice + 10;
+                    $slice = $slice + 13;
                 }
                 $input = array_slice($output, $slice, 1);  //récupère la partie de la réponse à la commande où se trouve le nom du fichier
                 $rest = implode("','",$input); //la convertit en une chaîne
                 $restarr[$i] = substr($rest, 31, -1); //récupère uniquement le nom du fichier
+                /*print_r($output);
+                echo '<br>';
+                echo "<br>";
+                echo "slice : " . $slice;
+                echo "<br>";
+                echo "rest : " . $rest;
+                echo "<br>";
+                echo $restarr[$i];
+                echo '<br>';*/
                 $restarrcp = $restarr[$i]; //on garde le nom original (nom du fichier)
-                $find = 0; //0 = 3 caractères pour l'extension, 1=4, 2=6*/
+                $find = 0; //0 = 3 caractères pour l'extension, 1=4, 2=6
+                
             }
             else
             {
                 if($i == 0)
                 {
-                    $slice = 3;
+                    $slice = 6;
                 }
                 else
                 {
-                    $slice = $slice + 5;
+                    $slice = $slice + 8;
                 }
                 $input = array_slice($output, $slice, 1);  //récupère la partie de la réponse à la commande où se trouve le nom du fichier
                 $rest = implode("','",$input); //la convertit en une chaîne
                 $restarr[$i] = substr($rest, 24); //récupère uniquement le nom du fichier
+                /*print_r($output);
+                echo '<br>';
+                echo "<br>";
+                echo "slice : " . $slice;
+                echo "<br>";
+                echo "rest : " . $rest;
+                echo "<br>";
+                echo $restarr[$i];
+                echo '<br>';*/
                 $restarrcp = $restarr[$i]; //on garde le nom original (nom du fichier)
                 $find = 0; //0 = 3 caractères pour l'extension, 1=4 */
             }
@@ -377,6 +431,10 @@ switch ($type) {
             }
 
             $restarr[$i] = $restarr[$i] . $extension; //rajoute l'extension
+            /*echo $restarr[$i];
+            echo "<br>";
+            echo "__________________________________________________________";
+            echo '<br>';*/
             
             if(sizeof($title)>1 && isset($ordre)) //si plus d'un fichier et qu'on veut conserver l'ordre
             {
@@ -389,10 +447,9 @@ switch ($type) {
                     $j = strval($i); //sinon juste 10,11,12...
                 }
                 $restarr[$i] = $j . ' - ' . $restarr[$i]; //on met au format "numero - nomfichier"
-
                 rename ($renamedir . '/' . $restarrcp, $renamedir . '/' . $restarr[$i]); //on renomme
             }
-            elseif(sizeof($title)==1)  
+            else if(sizeof($title)==1)  
             {
                 rename ($restarrcp, $restarr[$i]); //on renomme
             }
@@ -421,23 +478,26 @@ else
     $rest = $restarr[0];
 }
 
-
-/*echo "filename : ";
-echo $rest;
-echo "<br>";*/
-
-if (file_exists($rest)) { //télécharge le fichier
+//echo 'filename : ' . $rest;
+if (file_exists($rest)) {
+    ob_start();
     header('Content-Description: File Transfer');
-    header('Content-Type: application/octet-stream');
+    header('Content-Type: application/x-tar-gz');
     header('Content-Disposition: attachment; filename="'.basename($rest).'"');
     header('Expires: 0');
     header('Cache-Control: must-revalidate');
     header('Pragma: public');
     header('Content-Length: ' . filesize($rest));
+
+    // Clean the output buffer and flush before reading the file
+    ob_clean();
+    flush();
+
     readfile($rest);
-}
-else
-{
+    ob_end_flush();
+    // Terminate script execution
+    //exit;
+} else {
     echo "erreur, un bug est apparu, pas de chance :/";
 }
 
@@ -450,12 +510,14 @@ if(sizeof($title)>1)
 {
     if($rename)
     {
-        exec('yes | rm -r ' . $rename); //supprime les fichiers
+        exec('yes | rm -R ' . $rename); //supprime les fichiers
     }
     else
     {
-        exec('yes | rm -r contenu'); //supprime les fichiers
+        exec('yes | rm -R contenu'); //supprime les fichiers
     }
 }
+// Terminate script execution
+exit;
 ?>
 <a href="url.php"> retour </a>
