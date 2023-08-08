@@ -42,7 +42,6 @@ for ($i=0; $i < sizeof($title); $i++)
             unset($selectedElements[$j]);
         }
         else if (empty($posTimer[2*$j])) { //à partir du début de la vidéo
-            
             $tabelements[2*$i] = '00:00';
             $tabelements[2*$i+1] = $posTimer[2*$j+1];
         } 
@@ -132,6 +131,8 @@ switch ($type) {
                     if(!empty($tabelements[2*$i]))
                     {
                         exec('cd ' . $renamedir . ' && yt-dlp -x --audio-format ' . $format . ' ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts', $output, $retval); 
+                        //echo 'cd ' . $renamedir . ' && yt-dlp -x --audio-format ' . $format . ' ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts'; 
+
                     }
                     else
                     {
@@ -144,9 +145,11 @@ switch ($type) {
             {
                 if ($format == 'best') 
                 {
+                    echo 'format = best';
                     if(!empty($tabelements[2*$i]))
                     {
                         exec('yt-dlp -x ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts', $output, $retval); 
+                        echo 'yt-dlp -x ' . $title[$i] . ' --download-sections *' . $tabelements[2*$i] . '-' . $tabelements[2*$i+1] . ' --force-keyframes-at-cuts'; 
                     }
                     else
                     {
@@ -171,11 +174,11 @@ switch ($type) {
                 if(!empty($tabelements[2*$i]))
                 {
                     if (sizeof($title)==1) {
-                        $slice = 7;
+                        $slice = 9;
                     }
                     else
                     {
-                        $slice = 8;
+                        $slice = 9;
                     }
                 }
                 else
@@ -187,7 +190,7 @@ switch ($type) {
             {
                 if(!empty($tabelements[2*$i]))
                 {
-                    $slice = $slice + 10;
+                    $slice = $slice + 11;
                 }
                 else
                 {
@@ -267,7 +270,7 @@ switch ($type) {
             echo "<br>";
             echo "_______________________________________";
             echo "<br>";*/
-            
+        
             if(sizeof($title)>1 && isset($ordre)) //si plus d'un fichier et qu'on veut conserver l'ordre
             {
                 if($i < 10)
@@ -360,12 +363,33 @@ switch ($type) {
             {
                 if($i == 0)
                 {
-                    $slice = 10;
+                    if(!empty($tabelements[2*$i])) //probleme à voir lorsque timer
+                    {
+                        if (sizeof($title)==1) {
+                            $slice = 7;
+                        }
+                        else
+                        {
+                            $slice = 9;
+                        }
+                    }
+                    else
+                    {
+                        $slice = 10;
+                    }
                 }
                 else
                 {
-                    $slice = $slice + 13;
+                    if(!empty($tabelements[2*$i]))
+                    {
+                        $slice = $slice + 11;
+                    }
+                    else
+                    {
+                        $slice = $slice + 13;
+                    }
                 }
+
                 $input = array_slice($output, $slice, 1);  //récupère la partie de la réponse à la commande où se trouve le nom du fichier
                 $rest = implode("','",$input); //la convertit en une chaîne
                 $restarr[$i] = substr($rest, 31, -1); //récupère uniquement le nom du fichier
