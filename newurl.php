@@ -126,16 +126,18 @@
                 <button id="addRow" type="button" class="btn btn-info">Ajouter un lien</button>
             </div>
         </div>
-        <div id="newRow"></div>
-        <h4> Renommez si vous le souhaitez le dossier qui contiendra vos téléchargements (uniquement si plusieurs liens) </h4>
-        <input type="text" id="rename" name="rename" class="form-control" autocomplete="off" disabled>
-        <fieldset>
-            <legend>Cochez cette case pour garder l'ordre des liens lors du téléchargement tels que vous les avez renseignés (uniquement si plusieurs liens)</legend>
-            <div>
-                <input type="checkbox" id="ordre" name="ordre" checked disabled>
-                <label for="ordre">Coché pour oui, décoché pour non. Si case décochée (non) les fichiers seront dans l'ordre alphabétique.</label>
-            </div>
-        </fieldset>
+        <div id="formOptions">
+            <div id="newRow"></div>
+            <h4> Renommez si vous le souhaitez le dossier qui contiendra vos téléchargements (uniquement si plusieurs liens) </h4>
+            <input type="text" id="rename" name="rename" class="form-control" autocomplete="off" disabled>
+            <fieldset>
+                <legend>Cochez cette case pour garder l'ordre des liens lors du téléchargement tels que vous les avez renseignés (uniquement si plusieurs liens ou/et si playlist)</legend>
+                <div>
+                    <input type="checkbox" id="ordre" name="ordre" disabled>
+                    <label for="ordre">Coché pour oui, décoché pour non. Si case décochée (non) les fichiers seront dans l'ordre alphabétique.</label>
+                </div>
+            </fieldset>
+        </div>
         <input type="submit" name="submit" value="TELECHARGER" style="background-color: #1a53ff; color: white; border-radius: 6px; padding: 5px; padding-left: 12px; padding-right: 12px; cursor: pointer;">
     </form>
     <input type="button" name="reinit" id="reinit" value="REINITIALISER" style="margin-left: 15px; background-color: #f90d0d; color: white; border-radius: 6px; padding: 5px; padding-left: 12px; padding-right: 12px; cursor: pointer;">
@@ -199,6 +201,22 @@
                     checkboxElement.id = 'playlistcheckbox';
                     checkboxElement.name = 'playlistcheckbox';
                     checkboxElement.checked = true;
+                    $("#ordre").prop('disabled', false);
+
+                    // Step 2: Attach an event listener
+                    checkboxElement.addEventListener('change', function() {
+                        // Step 3: Define the function to be called when the checkbox changes
+                        if (checkboxElement.checked) {
+                            $("#ordre").prop('disabled', false);
+
+                            // Do something when the checkbox is checked
+                        } else {
+                            if ($("#inputFormRow").length == 0) {
+                                $("#ordre").prop('disabled', true);
+                            }
+                            // Do something when the checkbox is unchecked
+                        }
+                    });
 
                     // Insert the checkbox before the second child of the closest element
                     closest.insertBefore(checkboxElement, closest.children[1]);
@@ -250,6 +268,13 @@
             $("#rename").attr("placeholder", "");
             $("#rename").val('');
             $("#ordre").prop('disabled', true);
+            var isChecked = $('#playlistcheckbox').prop('checked');
+
+            if (isChecked) {
+                console.log('Checkbox is checked');
+            } else {
+                console.log('Checkbox is not checked');
+            }
         }
     });
 
