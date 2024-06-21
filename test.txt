@@ -1,0 +1,15 @@
+---BEGINNING TEST---
+flush()'d 0 times. Connection aborted is now: NO
+flush()'d 0 times. Connection aborted is now: NO
+flush()'d 0 times. Connection aborted is now: NO
+flush()'d 0 times. Connection aborted is now: NO
+PHP is shutting down. isAborted: 1
+DestructTester is getting destructed. isAborted: 1
+---BEGINNING TEST---
+flush()'d 0 times. Connection aborted is now: NO
+flush()'d 0 times. Connection aborted is now: NO
+flush()'d 0 times. Connection aborted is now: NO
+flush()'d 0 times. Connection aborted is now: NO
+flush()'d 0 times. Connection aborted is now: NO
+PHP is shutting down. isAborted: 1
+DestructTester is getting destructed. isAborted: 1

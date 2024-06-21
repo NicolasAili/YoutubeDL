@@ -1,28 +1,40 @@
 <?php
 ignore_user_abort(true);
+// Set error reporting to show all errors except warnings
+error_reporting(E_ALL & ~E_WARNING);
+
+// Display errors and warnings on the screen
+ini_set('display_errors', 1);
+
+// Do not log warnings to the Apache log file
+ini_set('log_errors', 1);
+
+if (!defined('SIGTERM')) {
+    define('SIGTERM', 15);
+}
+
+while (ob_get_level()) {
+    ob_get_contents();
+    ob_end_clean();
+}
+
 class VideoDownloadManager
 {
     // Step 1: Define the log file path and name
     public $logFilePath = 'logs/script_log.txt';
     // Step 2: Create a variable to hold the log content
     public static $logContent = '';
-    // Step 3: Add text to the variable (e.g., log messages)
-    /*
-    $logContent .= 'Log entry 1' . PHP_EOL;
-    $logContent .= 'Log entry 2' . PHP_EOL;
-    $logContent .= 'Log entry 3' . PHP_EOL;
 
-    // Step 4: Write the log content to the log file
-    file_put_contents($logFilePath, $logContent, FILE_APPEND);
-
-    // Step 5: Optionally, you can also add a timestamp to each log entry
-    $logContentWithTimestamp = '[' . date('Y-m-d H:i:s') . '] ' . $logContent;
-
-    // Write the log content with timestamps to the log file
-    file_put_contents($logFilePath, $logContentWithTimestamp, FILE_APPEND);*/
     private $tasks = [];
     private $firstValidDownload;
     private $validFilenameCount;
+
+    private static $folderId;
+
+    public static function setFolderId($var)
+    {
+        self::$folderId = $var;
+    }
 
     public function addTask(string $url, string $format, string $timerBegin, string $timerEnd)
     {
@@ -101,8 +113,6 @@ class VideoDownloadManager
         foreach ($this->tasks as $task) {
             if ($task->filename) {
                 $newfilename = $task->clearedFilename;
-                echo $newfilename;
-                echo "<br>";
                 if ($order) {
                     if ($i < 10) {
                         $j = '0' . strval($i); //pour les fichier 1 à 9 on met 00,01,02...
@@ -111,7 +121,7 @@ class VideoDownloadManager
                     }
                     $newfilename = $j . ' - ' . $newfilename; //on met au format "numero - nomfichier"
                 }
-                rename('contenu/' . $task->filename, 'contenu/' . $newfilename); //on renomme
+                rename(self::$folderId . '/' . $task->filename, self::$folderId . '/' . $newfilename); //on renomme
                 $i++;
             } elseif ($task->isPlaylist == true && $task->isPlaylistValid == true) {
                 $i = 0;
@@ -125,7 +135,7 @@ class VideoDownloadManager
                         }
                         $newfilename = $j . ' - ' . $newfilename; //on met au format "numero - nomfichier"
                     }
-                    rename('contenu/' . $task->playlistName . '/' . $filename, 'contenu/' . $task->playlistName . '/' . $newfilename); //on renomme
+                    rename(self::$folderId . '/' . $task->playlistName . '/' . $filename, self::$folderId . '/' . $task->playlistName . '/' . $newfilename);
                     $i++;
                 }
             }
@@ -139,7 +149,7 @@ class VideoDownloadManager
             if (!empty($task->filename)) {
                 // If this is the first valid 'filename', store it
                 if ($validFilenameCount === 0) {
-                    $this->firstValidDownload = 'contenu/' . $task->clearedFilename;
+                    $this->firstValidDownload = self::$folderId . '/' . $task->clearedFilename;
                 }
                 $validFilenameCount++;
             }
@@ -154,16 +164,12 @@ class VideoDownloadManager
     public function makeArchive($rename)
     {
         $escapedRename = escapeshellarg($rename);
-        echo $rename;
-        echo "<br>";
-        if ($rename == 'contenu') {
-            $makeArchiveCommand = 'tar -cvf contenu.tar contenu';
+        if ($rename == self::$folderId) {
+            $makeArchiveCommand = 'tar -cvf ' . self::$folderId . '.tar ' . self::$folderId;
             shell_exec($makeArchiveCommand);
-            echo $makeArchiveCommand;
-            echo "<br>";
         } else {
             // Rename the directory
-            $renameCommand = "mv contenu {$escapedRename}";
+            $renameCommand = "mv " . self::$folderId . " {$escapedRename}";
             shell_exec($renameCommand);
 
             // Create the archive
@@ -171,7 +177,7 @@ class VideoDownloadManager
             shell_exec($makeArchiveCommand);
 
             // Rename the directory back
-            $renameBackCommand = "mv {$escapedRename} contenu";
+            $renameBackCommand = "mv {$escapedRename} " . self::$folderId;
             shell_exec($renameBackCommand);
         }
     }
@@ -207,9 +213,9 @@ class VideoDownloadManager
 
     public function deleteFiles($rename)
     {
-        shell_exec('yes | rm -r /var/www/html/YoutubeDL/contenu/*');
+        shell_exec('rm -rf /var/www/html/YoutubeDL/' . self::$folderId);
         if ($this->validFilenameCount > 1) {
-            shell_exec('yes | rm "/var/www/html/YoutubeDL/' . $rename . '.tar"');
+            shell_exec('rm -f "/var/www/html/YoutubeDL/' . $rename . '.tar"');
         }
     }
 }
@@ -231,6 +237,13 @@ class VideoDownloadTask
     private $timerBegin;
     private $timerEnd;
 
+    private static $folderId;
+
+    public static function setFolderId($var)
+    {
+        self::$folderId = $var;
+    }
+
     public function __construct(string $url, string $format, string $timerBegin, string $timerEnd)
     {
         $this->url = $url;
@@ -246,10 +259,8 @@ class VideoDownloadTask
                     $error = 0;
                     $this->playlistName = $output[0];
 
-                    $directoryPath = 'contenu/' . $this->playlistName;
+                    $directoryPath = self::$folderId . '/' . $this->playlistName;
                     if (mkdir($directoryPath, 0777, true)) {
-                        echo "Directory created successfully.";
-                        echo "<br>";
                     } else {
                         VideoDownloadManager::$logContent .= 'Failed to create directory for playlist ' . $url . PHP_EOL;
                     }
@@ -295,35 +306,95 @@ class VideoDownloadTask
 
     public function executeDownload()
     {
+
+        $outputFile = "output.txt";
+
+        if ($this->isPlaylist == true && $this->isPlaylistValid == true) {
+
+            $playlistNameEscapedCmd = escapeshellcmd($this->playlistName);
+            $playlistNameEscaped = str_replace(' ', '\ ', $playlistNameEscapedCmd);
+            $outfileFoldered = self::$folderId . '/' . $playlistNameEscapedCmd . '/' . $outputFile;
+        } else {
+            $outfileFoldered = self::$folderId . '/' . $outputFile;
+        }
+
         //commande de téléchargement
         if ($this->isPlaylist == true && $this->isPlaylistValid == true) {
-            $playlistNameEscaped = escapeshellcmd($this->playlistName);
-            $playlistNameEscaped = str_replace(' ', '\ ', $playlistNameEscaped);
-
-            $downloadCommand = "cd contenu/{$playlistNameEscaped} && yt-dlp --no-warnings --print after_move:filepath" . ($this->formatType == 'audio' ? ' -x' : '')
+            $downloadCommand = "cd " . self::$folderId . "/{$playlistNameEscaped} && yt-dlp --no-warnings --print after_move:filepath" . ($this->formatType == 'audio' ? ' -x' : '')
                 . ($this->formatType == 'audio' && $this->format != 'besta'
                     ? ' --audio-format ' . $this->format
                     : ($this->formatType == 'video' && $this->format != 'bestv'
                         ? ' -f ' . $this->format
                         : ''))
-                . ' ' . $this->url;
+                . ' ' . $this->url
+                . " > $outputFile & echo $!; ";
         } else {
-            $downloadCommand = 'cd contenu && yt-dlp --no-warnings --print after_move:filepath,ext' . ($this->formatType == 'audio' ? ' -x' : '')
+            $downloadCommand = 'cd ' . self::$folderId . ' && yt-dlp --no-warnings --print after_move:filepath,ext' . ($this->formatType == 'audio' ? ' -x' : '')
                 . ($this->formatType == 'audio' && $this->format != 'besta'
                     ? ' --audio-format ' . $this->format
                     : ($this->formatType == 'video' && $this->format != 'bestv'
                         ? ' -f ' . $this->format
                         : ''))
                 . ($this->hasTimer ? ' --download-sections *' . $this->timerBegin . '-' . $this->timerEnd . ' --force-keyframes-at-cuts' : '')
-                . ' ' . $this->url;
+                . ' ' . $this->url
+                . " > $outputFile & echo $!; ";
+        }
+        error_log('-----------------------');
+        error_log('\n');
+        error_log("download : $downloadCommand");
+
+        $pid = exec($downloadCommand, $outputPid);
+        //error_log("pid : $pid");
+
+        $isDownloadOver = false;
+        //error_log($outfileFoldered);
+
+        function isProcessRunning($pid) {
+            $result = shell_exec(sprintf("ps %d", $pid));
+            return (count(preg_split("/\n/", $result)) > 2);
+        }
+        
+        $numSleeps = 0;
+        while (isProcessRunning($pid)) {
+            error_log("Process is still running...\n");
+            $connAbortedStr = connection_aborted() ? "YES" : "NO";
+            $str = "Slept $numSleeps times. Connection aborted: $connAbortedStr";
+            echo "$str<br>";
+            flush();
+
+
+            $connAbortedStr = connection_aborted() ? "YES" : "NO";
+
+            if (connection_aborted()) {
+                error_log("PHP is shutting down.");
+                posix_kill($pid, SIGTERM);
+                shell_exec('rm -rf /var/www/html/YoutubeDL/' . self::$folderId);
+                exit();
+            }
+            //error_log("flush()'d $numSleeps times. Connection aborted is now: $connAbortedStr\n");
+            $numSleeps++;
+            sleep(1);
+        }
+        //error_log("DONE SLEEPING!<br>");
+        error_log("Process is over\n");
+
+
+
+        $output = file_get_contents($outfileFoldered);
+        error_log("output : $output");
+        $output = explode("\n", $output);
+        foreach ($output as $item) {
+            error_log("first method");
+            error_log($item);
         }
 
-        exec($downloadCommand, $output, $retval); //telecharge
+
 
         if ($this->isPlaylist == true) {
             foreach ($output as $item) {
                 $this->playlistFilesname[] = basename($item);
                 $this->clearedPlaylistFilesname[] = $this->clearFilename(basename($item));
+                //error_log($this->clearFilename(basename($item)));
             }
         }
 
@@ -333,7 +404,7 @@ class VideoDownloadTask
                 $error = $this->handleErrors($output, $this->formatType);
                 if ($error) {
                     //on retente le download avec le meilleur format disponible
-                    $downloadCommand = 'cd contenu && yt-dlp' . ($this->formatType == 'audio' ? ' -x' : '') . ' ' . $this->url
+                    $downloadCommand = 'cd ' . self::$folderId . ' && yt-dlp' . ($this->formatType == 'audio' ? ' -x' : '') . ' ' . $this->url
                         . ($this->hasTimer ? ' --download-sections *' . $this->timerBegin . '-' . $this->timerEnd . ' --force-keyframes-at-cuts' : '')
                         . ' --print after_move:filepath,ext';
 
@@ -353,16 +424,16 @@ class VideoDownloadTask
                     $this->filename = null;
                 }
             } else {
-                $this->extension = $output[1];
-                $this->filename = basename($output[0]);
-                $this->clearedFilename = $this->clearFilename(basename($output[0]));
+                $this->extension = $output[0];
+                $this->filename = basename($output[1]);
+                $this->clearedFilename = $this->clearFilename(basename($output[1]));
             }
         }
     }
 
     public function handleErrors(array $output, string $formatType)
     {
-        $downloadCommand = 'cd contenu && yt-dlp' . ($this->formatType == 'audio' ? ' -x' : '') . ' ' . $this->url
+        $downloadCommand = 'cd ' . self::$folderId . ' && yt-dlp' . ($this->formatType == 'audio' ? ' -x' : '') . ' ' . $this->url
             . ($this->formatType == 'audio' && $this->format != 'besta'
                 ? ' --audio-format ' . $this->format
                 : ($this->formatType == 'video' && $this->format != 'bestv'
@@ -444,6 +515,24 @@ function displayVariables($urls, $formats, $timers, $selectedElements, $rename, 
     echo "<br>";
 }
 
+// Start the session
+session_start();
+
+
+// Get the session ID
+$sessionId = session_id() . '_' . uniqid();
+
+$directoryPath = $sessionId;
+if (mkdir($sessionId, 0777, true)) {
+} else {
+    VideoDownloadManager::$logContent .= 'Failed to create directory for playlist ' . $url . PHP_EOL;
+}
+
+
+
+VideoDownloadManager::setFolderId($sessionId);
+VideoDownloadTask::setFolderId($sessionId);
+
 
 // Instantiate the VideoDownloadManager
 $downloadManager = new VideoDownloadManager();
@@ -454,11 +543,17 @@ $timers = $_POST['posTimer']; //récupère les sections debut et fin
 $selectedElements = $_POST['selectedElements']; //récupère les liens concernés par un timer
 $rename = $_POST['rename']; //if multiple files specified name for renaming tar containing files
 if (!$rename) {
-    $rename = 'contenu';
+    $rename = $sessionId;
 }
 $ordre = $_POST['ordre']; //garder l'ordre ou non
 
+/*function handleDisconnect($sessionId, $rename)
+{
+    
+}
 
+// Register the shutdown function
+register_shutdown_function('handleDisconnect', $sessionId, $rename);*/
 
 
 
@@ -476,11 +571,27 @@ for ($i = 0; $i < count($urls); $i++) {
             $formats[$i] = 'besta';
         }
         if ($selectedElements[$i] != -1) {
-            if (VideoDownloadManager::isValidTimerFormat($timers[2 * $j]) && VideoDownloadManager::isValidTimerFormat($timers[2 * $j + 1])) {
-                $downloadManager->addTask($urls[$i], $formats[$i], $timers[2 * $j], $timers[2 * $j + 1]);
+            if (empty($timers[2 * $j])) {
+                if (VideoDownloadManager::isValidTimerFormat($timers[2 * $j + 1])) {
+                    $downloadManager->addTask($urls[$i], $formats[$i], "", $timers[2 * $j + 1]);
+                } else {
+                    VideoDownloadManager::$logContent .= 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL;
+                    $downloadManager->addTask($urls[$i], $formats[$i], "", "");
+                }
+            } elseif (empty($timers[2 * $j + 1])) {
+                if (VideoDownloadManager::isValidTimerFormat($timers[2 * $j])) {
+                    $downloadManager->addTask($urls[$i], $formats[$i], $timers[2 * $j], "");
+                } else {
+                    VideoDownloadManager::$logContent .= 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL;
+                    $downloadManager->addTask($urls[$i], $formats[$i], "", "");
+                }
             } else {
-                VideoDownloadManager::$logContent .= 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL;
-                $downloadManager->addTask($urls[$i], $formats[$i], "", "");
+                if (VideoDownloadManager::isValidTimerFormat($timers[2 * $j]) && VideoDownloadManager::isValidTimerFormat($timers[2 * $j + 1])) {
+                    $downloadManager->addTask($urls[$i], $formats[$i], $timers[2 * $j], $timers[2 * $j + 1]);
+                } else {
+                    VideoDownloadManager::$logContent .= 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL;
+                    $downloadManager->addTask($urls[$i], $formats[$i], "", "");
+                }
             }
             $j++;
         } else {
@@ -499,17 +610,18 @@ $downloadManager->renameAndOrder($ordre);
 
 if ($downloadManager->getValidCount() > 1) {
     $downloadManager->makeArchive($rename);
-    $downloadManager->download($rename . '.tar');
+    //$downloadManager->download($rename . '.tar');
 } else {
     $firstFilename = $downloadManager->getFirstValidDownload();
-    $downloadManager->download($firstFilename);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        //$downloadManager->download($firstFilename);
+    }
 }
 
 $downloadManager->deleteFiles($rename);
 
 
 echo VideoDownloadManager::$logContent;
-echo "<br>";
 
 
 // Flush output to make sure any progress messages are sent to the client

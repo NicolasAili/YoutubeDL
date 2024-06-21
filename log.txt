@@ -1,0 +1,24 @@
+---BEGINNING DOWNLOAD---
+Download complete. Output: /var/www/html/YoutubeDL/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER) [p2AWYanIHkc].opus
+opus
+
+PHP is shutting down. isAborted: 0
+DownloadHandler is getting destructed. isAborted: 0
+---BEGINNING DOWNLOAD---
+Download complete. Output: /var/www/html/YoutubeDL/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER) [p2AWYanIHkc].opus
+opus
+
+PHP is shutting down. isAborted: 0
+DownloadHandler is getting destructed. isAborted: 0
+---BEGINNING DOWNLOAD---
+Download complete. Output: /var/www/html/YoutubeDL/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER) [p2AWYanIHkc].opus
+opus
+
+PHP is shutting down. isAborted: 0
+DownloadHandler is getting destructed. isAborted: 0
+---BEGINNING DOWNLOAD---
+Download complete. Output: /var/www/html/YoutubeDL/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER) [p2AWYanIHkc].opus
+opus
+
+PHP is shutting down. isAborted: 0
+DownloadHandler is getting destructed. isAborted: 0

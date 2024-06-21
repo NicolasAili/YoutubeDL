@@ -14,166 +14,159 @@
 <head>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <style>
-        #btn-back-to-top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: none;
-        }
+    <!--<link rel="stylesheet" href="@fortawesome/fontawesome-free/css/all.min.css">-->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-        .timer,
-        .isOpened {
-            width: 38px;
-            height: 38px;
-            border: 2px solid #ff1f00;
-            transition: transform 0.2s;
-        }
-
-        .timer:hover,
-        .isOpened:hover {
-            cursor: pointer;
-            transform: translateY(-5px);
-        }
-
-        .btn {
-            transition: transform 0.2s;
-        }
-
-        .btn:hover {
-            transform: translateY(-5px);
-        }
-
-        #inputFormRow,
-        #inputFormRowOff {
-            margin-right: 15px;
-        }
-
-        .timerSelect {
-            display: flex;
-        }
-
-        .timerSelectInput {
-            border: 1px solid gray;
-            padding: 5px;
-        }
-
-
-        .timerInputFin {
-            float: right;
-        }
-
-
-        .timerInputInput {
-            width: 96px;
-            padding-left: 4px;
-            padding-right: 4px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="newurl.css">
 </head>
 
 <body>
-    <button type="button" class="btn btn-danger btn-floating btn-lg" id="btn-back-to-top">
-        <i class="fas fa-arrow-up"></i>
-    </button>
-    <div style="margin-top: 30px; margin-left: 15px;">
-        <h1> Outil de telechargement de vidéos youtube</h1>
-        <h4> Note : pour télécharger seulement une partie d'une vidéo, cliquez sur la pendule puis renseignez le début et la fin de la section que vous souhaitez télécharger. Si la section commence au début de la vidéo, ou termine à la fin de la vidéo, ne mettez rien dans les champs Debut/Fin (en fonction de votre situation) </h4>
-        <h4 style="background-color: red; display: inline;"> Format pour les champs "debut" et "fin" : HH:MM:SS OU MM:SS OU SS </h4>
-        <h4> Exemples : 01:05:22 pour 1 heure 5 minutes 22 secondes, 05:25 pour 5 minutes 25, 04 pour 4 secondes </h4>
-    </div>
-    <select id="main-dropdown">
-        <option value="besta">best (a)</option>
-        <option value="aac">aac (a)</option>
-        <option value="flac">flac (a)</option>
-        <option value="mp3">mp3 (a)</option>
-        <option value="m4a">m4a (a)</option>
-        <option value="opus">opus (a)</option>
-        <option value="vorbis">vorbis (a)</option>
-        <option value="wav">wav (a)</option>
-        <option value="bestv">best (v)</option>
-        <option value="3gp">3gp (v)</option>
-        <option value="aac">aac (v)</option>
-        <option value="flv">flv (v)</option>
-        <option value="mp4">mp4 (v)</option>
-        <option value="ogg">ogg (v)</option>
-        <option value="webm">webm (v)</option>
-    </select>
-    <form id="form" action="newdownload.php" method="post" style="margin-top: 15px; margin-left: 15px;">
-        <div id="inputFormRowOff">
-            <div class="input-group mb-3">
-                <input type="text" name="title[]" class="form-control m-input" placeholder="Entrer URL" autocomplete="off" required>
-                <select class="format-dropdown" name="format[]">
-                    <option value="besta">best (a)</option>
-                    <option value="aac">aac (a)</option>
-                    <option value="flac">flac (a)</option>
-                    <option value="mp3">mp3 (a)</option>
-                    <option value="m4a">m4a (a)</option>
-                    <option value="opus">opus (a)</option>
-                    <option value="vorbis">vorbis (a)</option>
-                    <option value="wav">wav (a)</option>
-                    <option value="bestv">best (v)</option>
-                    <option value="3gp">3gp (v)</option>
-                    <option value="aac">aac (v)</option>
-                    <option value="flv">flv (v)</option>
-                    <option value="mp4">mp4 (v)</option>
-                    <option value="ogg">ogg (v)</option>
-                    <option value="webm">webm (v)</option>
-                </select>
-                <div class="timerSelect">
-                    <img class="timer" src="img/timer.jpg" alt="Timer">
+    <header class="header">
+        <div class="left">onchetube</div>
+        <div class="right">FAQ</div>
+    </header>
+    <div class="main">
+        <button type="button" class="btn btn-danger btn-floating btn-lg" id="btn-back-to-top">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <h1> Bienvenue sur OncheTube</h1>
+        <div class="defaultformat">
+            <h4>Modifier tous les formats</h4>
+            <select id="main-dropdown" style="width: 150px;">
+                <option value="besta" data-icon="fa-solid fa-music">automatique</option>
+                <option value="aac" data-icon="fa-solid fa-music">aac</option>
+                <option value="flac" data-icon="fa-solid fa-music">flac</option>
+                <option value="mp3" data-icon="fa-solid fa-music">mp3</option>
+                <option value="m4a" data-icon="fa-solid fa-music">m4a</option>
+                <option value="opus" data-icon="fa-solid fa-music">opus</option>
+                <option value="vorbis" data-icon="fa-solid fa-music">vorbis</option>
+                <option value="wav" data-icon="fa-solid fa-music">wav</option>
+                <option value="bestv" data-icon="fa-solid fa-video">automatique</option>
+                <option value="3gp" data-icon="fa-solid fa-video">3gp</option>
+                <option value="aac" data-icon="fa-solid fa-video">aac</option>
+                <option value="flv" data-icon="fa-solid fa-video">flv</option>
+                <option value="mp4" data-icon="fa-solid fa-video">mp4</option>
+                <option value="ogg" data-icon="fa-solid fa-video">ogg</option>
+                <option value="webm" data-icon="fa-solid fa-video">webm</option>
+            </select>
+        </div>
+        <form id="form" action="newdownload.php" method="post" style="margin-top: 15px; margin-left: 15px;">
+            <div id="inputFormRowOff">
+                <div class="input-group mb-3">
+                    <input type="text" name="title[]" class="form-control m-input" placeholder="Copiez un lien ici" autocomplete="off" required>
+                    <select class="format-dropdown" name="format[]" style="width: 150px;">
+                        <option value="besta" data-icon="fa-solid fa-music">automatique</option>
+                        <option value="aac" data-icon="fa-solid fa-music">aac</option>
+                        <option value="flac" data-icon="fa-solid fa-music">flac</option>
+                        <option value="mp3" data-icon="fa-solid fa-music">mp3</option>
+                        <option value="m4a" data-icon="fa-solid fa-music">m4a</option>
+                        <option value="opus" data-icon="fa-solid fa-music">opus</option>
+                        <option value="vorbis" data-icon="fa-solid fa-music">vorbis</option>
+                        <option value="wav" data-icon="fa-solid fa-music">wav</option>
+                        <option value="bestv" data-icon="fa-solid fa-video">automatique</option>
+                        <option value="3gp" data-icon="fa-solid fa-video">3gp</option>
+                        <option value="aac" data-icon="fa-solid fa-video">aac</option>
+                        <option value="flv" data-icon="fa-solid fa-video">flv</option>
+                        <option value="mp4" data-icon="fa-solid fa-video">mp4</option>
+                        <option value="ogg" data-icon="fa-solid fa-video">ogg</option>
+                        <option value="webm" data-icon="fa-solid fa-video">webm</option>
+                    </select>
+                    <div class="timerSelect">
+                        <img class="timer" src="img/timer.jpg" alt="Timer">
+                    </div>
+                    <button id="addRow" type="button" class="btn btn-info">Ajouter un lien</button>
                 </div>
-                <button id="addRow" type="button" class="btn btn-info">Ajouter un lien</button>
             </div>
-        </div>
-        <div id="formOptions">
             <div id="newRow"></div>
-            <h4> Renommez si vous le souhaitez le dossier qui contiendra vos téléchargements (uniquement si plusieurs liens) </h4>
-            <input type="text" id="rename" name="rename" class="form-control" autocomplete="off" disabled>
-            <fieldset>
-                <legend>Cochez cette case pour garder l'ordre des liens lors du téléchargement tels que vous les avez renseignés (uniquement si plusieurs liens ou/et si playlist)</legend>
-                <div>
-                    <input type="checkbox" id="ordre" name="ordre" disabled>
-                    <label for="ordre">Coché pour oui, décoché pour non. Si case décochée (non) les fichiers seront dans l'ordre alphabétique.</label>
+            <div id="formOptions">
+                <div id="renamediv">
+                    <h4>(optionnel) Renommez le dossier qui contiendra vos téléchargements</h4>
+                    <input type="text" id="rename" name="rename" class="form-control" autocomplete="off">
                 </div>
-            </fieldset>
+                <div id="ordrediv">
+                    <fieldset>
+                        <input type="checkbox" id="ordre" name="ordre">
+                        <legend>(optionnel) Cochez pour conserver l'ordre (ordre alphabétique par défaut)</legend>
+                    </fieldset>
+                </div>
+            </div>
+            <div id="buttons">
+                <input type="submit" name="submit" value="TELECHARGER" class="btnsubmit download-btn">
+                <input type="button" name="reinit" id="reinit" value="REINITIALISER" class="btnreset reset-btn">
+            </div>
+        </form>
+        <div style="margin-top: 30px; margin-left: 15px;">
+            <h4> Note : pour télécharger seulement une partie d'une vidéo, cliquez sur la pendule puis renseignez le début et la fin de la section que vous souhaitez télécharger. Si la section commence au début de la vidéo, ou termine à la fin de la vidéo, ne mettez rien dans les champs Debut/Fin (en fonction de votre situation) </h4>
+            <h4 style="background-color: red; display: inline;"> Format pour les champs "debut" et "fin" : HH:MM:SS OU MM:SS OU SS </h4>
+            <h4> Exemples : 01:05:22 pour 1 heure 5 minutes 22 secondes, 05:25 pour 5 minutes 25, 04 pour 4 secondes </h4>
         </div>
-        <input type="submit" name="submit" value="TELECHARGER" style="background-color: #1a53ff; color: white; border-radius: 6px; padding: 5px; padding-left: 12px; padding-right: 12px; cursor: pointer;">
-    </form>
-    <input type="button" name="reinit" id="reinit" value="REINITIALISER" style="margin-left: 15px; background-color: #f90d0d; color: white; border-radius: 6px; padding: 5px; padding-left: 12px; padding-right: 12px; cursor: pointer;">
-    <h3 style="margin-left: 2%; margin-top: 50px;"> A noter </h3>
-    <div>
-        <p style="width: 80%; margin-left: 2%;">
-            Soyez patient, le téléchargement n'est pas instantané. D'abord les fichiers sont téléchargés sur le serveur (période où vous devez attendre) puis ils vous sont transmis.
-        </p>
-        <p style="width: 80%; margin-left: 2%;">
-            Si une erreur apparaît ou que un ou plusieurs fichiers sont manquants, cela est très probablement dû au fait que le ou les fichiers souhaités n'est ou ne sont pas disponibles dans votre pays, ou bien que le format souhaité n'est pas disponible.
-        </p>
+        <h3 style="margin-left: 2%; margin-top: 50px;"> A noter </h3>
+        <div>
+            <p style="width: 80%; margin-left: 2%;">
+                Soyez patient, le téléchargement n'est pas instantané. D'abord les fichiers sont téléchargés sur le serveur (période où vous devez attendre) puis ils vous sont transmis.
+            </p>
+            <p style="width: 80%; margin-left: 2%;">
+                Si une erreur apparaît ou que un ou plusieurs fichiers sont manquants, cela est très probablement dû au fait que le ou les fichiers souhaités n'est ou ne sont pas disponibles dans votre pays, ou bien que le format souhaité n'est pas disponible.
+            </p>
+        </div>
     </div>
 </body>
 
 </html>
 
 <script type="text/javascript">
-    // Get references to the main dropdown and the other dropdowns
-    const mainDropdown = document.getElementById('main-dropdown');
+    $(document).ready(function() {
+        function formatOption(option) {
+            if (!option.id) {
+                return option.text;
+            }
+            var $option = $(
+                '<span>' + option.text + ' <i class="' + $(option.element).data('icon') + '"></i></span>'
+            );
+            return $option;
+        }
 
+        $('#main-dropdown').select2({
+            templateResult: formatOption,
+            templateSelection: formatOption
+        });
+        $('.format-dropdown').select2({
+            templateResult: formatOption,
+            templateSelection: formatOption
+        });
+        // Add event listener to the main dropdown
+        $('#main-dropdown').on('select2:select', function(e) {
+            // Get the selected value from the main dropdown
+            const selectedValue = e.params.data.id;
+
+            // Update other dropdowns
+            updateOtherDropdowns(selectedValue);
+        });
+    });
     // Function to update other dropdowns based on the main dropdown's value
     function updateOtherDropdowns(selectedValue) {
         const commonDropdowns = document.querySelectorAll('.format-dropdown');
         commonDropdowns.forEach(dropdown => {
-            dropdown.value = selectedValue;
+            $(dropdown).val(selectedValue).trigger('change'); // Update value and trigger change event for Select2
         });
     }
 
-    // Add an event listener to the main dropdown
-    mainDropdown.addEventListener('change', function() {
-        // Get the selected value from the main dropdown
-        const selectedValue = mainDropdown.value;
+    function isPlaylistActive() {
+        var anyChecked = false;
+        $('.playlistcheckbox').each(function() {
+            if ($(this).prop('checked')) {
+                anyChecked = true;
+                return false; // Exit the loop early if at least one is checked
+            }
+        });
+        if ($("#inputFormRow").length == 0 && anyChecked == true) {
 
-        // Update the other dropdowns
-        updateOtherDropdowns(selectedValue);
-    });
+        }
+        console.log(anyChecked);
+        return anyChecked;
+    }
 
     function detectPlaylist() {
         const inputElements = document.querySelectorAll('.m-input');
@@ -198,21 +191,22 @@
                     // Create the checkbox element
                     const checkboxElement = document.createElement('input');
                     checkboxElement.type = 'checkbox';
-                    checkboxElement.id = 'playlistcheckbox';
+                    checkboxElement.className = 'playlistcheckbox';
                     checkboxElement.name = 'playlistcheckbox';
                     checkboxElement.checked = true;
-                    $("#ordre").prop('disabled', false);
+                    $("#ordrediv").css("display", "block");
 
                     // Step 2: Attach an event listener
                     checkboxElement.addEventListener('change', function() {
                         // Step 3: Define the function to be called when the checkbox changes
                         if (checkboxElement.checked) {
-                            $("#ordre").prop('disabled', false);
+                            $("#ordrediv").css("display", "block");
 
                             // Do something when the checkbox is checked
                         } else {
-                            if ($("#inputFormRow").length == 0) {
-                                $("#ordre").prop('disabled', true);
+                            if (!isPlaylistActive()) {
+                                console.log("unchecking");
+                                $("#ordrediv").css("display", "none");
                             }
                             // Do something when the checkbox is unchecked
                         }
@@ -223,9 +217,13 @@
                 } else {
                     console.log("not detected");
                     // Check if there's already a checkbox present
-                    const existingCheckbox = closest.querySelector('#playlistcheckbox');
+                    const existingCheckbox = closest.querySelector('.playlistcheckbox');
                     if (existingCheckbox) {
                         existingCheckbox.remove(); // Remove the existing checkbox
+                    }
+                    if (!isPlaylistActive()) {
+                        console.log("replacing with non playlist url");
+                        $("#ordrediv").css("display", "none");
                     }
                 }
             });
@@ -239,14 +237,25 @@
         var html = '';
         html += '<div id="inputFormRow">';
         html += '<div class="input-group mb-3">';
-        html += '<input type="text" name="title[]" class="form-control m-input" placeholder="Entrer URL" autocomplete="off">';
+        html += '<input type="text" name="title[]" class="form-control m-input" placeholder="Copiez un lien ici" autocomplete="off">';
 
-        html += '<select class="format-dropdown" name="format[]">' + '<option value="besta">best (a)</option>' + '<option value="aac">aac (a)</option>' +
-            '<option value="flac">flac (a)</option>' + '<option value="mp3">mp3 (a)</option>' + '<option value="m4a">m4a (a)</option>' +
-            '<option value="opus">opus (a)</option>' + '<option value="vorbis">vorbis (a)</option>' + '<option value="wav">wav (a)</option>' +
-            '<option value="bestv">best (v)</option>' + '<option value="3gp">3gp (v)</option>' + '<option value="aac">aac (v)</option>' +
-            '<option value="flv">flv (v)</option>' + '<option value="mp4">mp4 (v)</option>' + '<option value="ogg">ogg (v)</option>' +
-            '<option value="webm">webm (v)</option>' + '</select>';
+        html += '<select class="format-dropdown" name="format[]" style="width: 150px">' +
+            '<option value="besta" data-icon="fa-solid fa-music">automatique</option>' +
+            '<option value="aac" data-icon="fa-solid fa-music">aac (a)</option>' +
+            '<option value="flac" data-icon="fa-solid fa-music">flac (a)</option>' +
+            '<option value="mp3" data-icon="fa-solid fa-music">mp3 (a)</option>' +
+            '<option value="m4a" data-icon="fa-solid fa-music">m4a (a)</option>' +
+            '<option value="opus" data-icon="fa-solid fa-music">opus (a)</option>' +
+            '<option value="vorbis" data-icon="fa-solid fa-music">vorbis (a)</option>' +
+            '<option value="wav" data-icon="fa-solid fa-music">wav (a)</option>' +
+            '<option value="bestv" data-icon="fa-solid fa-video">automatique</option>' +
+            '<option value="3gp" data-icon="fa-solid fa-video">3gp (v)</option>' +
+            '<option value="aac" data-icon="fa-solid fa-video">aac (v)</option>' +
+            '<option value="flv" data-icon="fa-solid fa-video">flv (v)</option>' +
+            '<option value="mp4" data-icon="fa-solid fa-video">mp4 (v)</option>' +
+            '<option value="ogg" data-icon="fa-solid fa-video">ogg (v)</option>' +
+            '<option value="webm" data-icon="fa-solid fa-video">webm (v)</option>' +
+            '</select>';
         html += '<div class="timerSelect"><img class="timer" src="img/timer.jpg" alt="Timer"></div>';
         html += '<div class="input-group-append">';
 
@@ -254,9 +263,27 @@
         html += '</div>';
         html += '</div>';
         $('#newRow').append(html);
-        $("#rename").prop('disabled', false);
-        $("#rename").attr("placeholder", "Renommez");
-        $("#ordre").prop('disabled', false);
+
+        function formatOption(option) {
+            if (!option.id) {
+                return option.text;
+            }
+            var $option = $(
+                '<span>' + option.text + ' <i class="' + $(option.element).data('icon') + '"></i></span>'
+            );
+            return $option;
+        }
+
+        // Reinitialize Select2 for new elements
+        $('.format-dropdown').select2({
+            templateResult: formatOption,
+            templateSelection: formatOption,
+            width: 'style'
+        });
+
+        $("#renamediv").css("display", "block");
+        $("#rename").attr("placeholder", "Renommez le dossier qui contiendra les téléchargements");
+        $("#ordrediv").css("display", "block");
         detectPlaylist();
     });
 
@@ -264,16 +291,12 @@
     $(document).on('click', '#removeRow', function() {
         $(this).closest('#inputFormRow').remove();
         if ($("#inputFormRow").length == 0) {
-            $("#rename").prop('disabled', true);
+            $("#renamediv").css("display", "none");
             $("#rename").attr("placeholder", "");
             $("#rename").val('');
-            $("#ordre").prop('disabled', true);
-            var isChecked = $('#playlistcheckbox').prop('checked');
-
-            if (isChecked) {
-                console.log('Checkbox is checked');
-            } else {
-                console.log('Checkbox is not checked');
+            if (!isPlaylistActive()) {
+                console.log("deleting last row");
+                $("#ordrediv").css("display", "none");
             }
         }
     });
@@ -283,8 +306,9 @@
             $('#inputFormRow').remove();
         }
         $('.form-control').val('');
-        $("#rename").prop('disabled', true);
-        $("#ordre").prop('disabled', true);
+        $("#renamediv").css("display", "none");
+        console.log("reinit");
+        $("#ordrediv").css("display", "none");
     });
 
     //timer
