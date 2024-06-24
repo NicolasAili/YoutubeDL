@@ -182,35 +182,6 @@ class VideoDownloadManager
         }
     }
 
-    public function download($filename)
-    {
-        $mime_type = mime_content_type($filename);
-
-        // Check if the file exists
-        if (file_exists($filename)) {
-            // Get the basename of the file (without path)
-            $basename = basename($filename);
-
-            // Set the appropriate headers
-            header('Content-Type: ' . $mime_type);
-            header('Content-Disposition: attachment; filename="' . $basename . '"');
-            header('Content-Length: ' . filesize($filename));
-
-            // Clean the output buffer and flush before reading the file
-            ob_clean();
-            flush();
-
-            readfile($filename);
-
-            ob_end_flush();
-        } else {
-            // File not found
-            die('File not found');
-        }
-    }
-
-
-
     public function deleteFiles($rename)
     {
         shell_exec('rm -rf /var/www/html/YoutubeDL/' . self::$folderId);
@@ -262,7 +233,7 @@ class VideoDownloadTask
                     $directoryPath = self::$folderId . '/' . $this->playlistName;
                     if (mkdir($directoryPath, 0777, true)) {
                     } else {
-                        VideoDownloadManager::$logContent .= 'Failed to create directory for playlist ' . $url . PHP_EOL;
+                        error_log('Failed to create directory for playlist ' . $url . PHP_EOL);
                     }
                 }
             }
@@ -302,6 +273,12 @@ class VideoDownloadTask
         } else {
             $this->hasTimer = 1;
         }
+    }
+
+    private function isProcessRunning($pid)
+    {
+        $result = shell_exec(sprintf("ps %d", $pid));
+        return (count(preg_split("/\n/", $result)) > 2);
     }
 
     public function executeDownload()
@@ -349,21 +326,9 @@ class VideoDownloadTask
         $isDownloadOver = false;
         //error_log($outfileFoldered);
 
-        function isProcessRunning($pid) {
-            $result = shell_exec(sprintf("ps %d", $pid));
-            return (count(preg_split("/\n/", $result)) > 2);
-        }
-        
-        $numSleeps = 0;
-        while (isProcessRunning($pid)) {
+        while ($this->isProcessRunning($pid)) {
             error_log("Process is still running...\n");
-            $connAbortedStr = connection_aborted() ? "YES" : "NO";
-            $str = "Slept $numSleeps times. Connection aborted: $connAbortedStr";
-            echo "$str<br>";
             flush();
-
-
-            $connAbortedStr = connection_aborted() ? "YES" : "NO";
 
             if (connection_aborted()) {
                 error_log("PHP is shutting down.");
@@ -372,7 +337,6 @@ class VideoDownloadTask
                 exit();
             }
             //error_log("flush()'d $numSleeps times. Connection aborted is now: $connAbortedStr\n");
-            $numSleeps++;
             sleep(1);
         }
         //error_log("DONE SLEEPING!<br>");
@@ -383,11 +347,6 @@ class VideoDownloadTask
         $output = file_get_contents($outfileFoldered);
         error_log("output : $output");
         $output = explode("\n", $output);
-        foreach ($output as $item) {
-            error_log("first method");
-            error_log($item);
-        }
-
 
 
         if ($this->isPlaylist == true) {
@@ -414,19 +373,21 @@ class VideoDownloadTask
                         $this->extension = $output[1];
                         $this->filename = basename($output[0]);
                         $this->clearedFilename = $this->clearFilename(basename($output[0]));
-                        VideoDownloadManager::$logContent .= "téléchargement réussi en changeant de format pour " . $this->clearedFilename . PHP_EOL;
+                        error_log("téléchargement réussi en changeant de format pour " . $this->clearedFilename . PHP_EOL);
                     } else { //erreur générale sur ce download
-                        VideoDownloadManager::$logContent .= "erreur générale après erreur format pour " . $this->url . PHP_EOL;
+                        error_log("erreur générale après erreur format pour " . $this->url . PHP_EOL);
                         $this->filename = null;
                     }
                 } else { //erreur générale sur ce download
-                    VideoDownloadManager::$logContent .= "erreur générale pour " . $this->url . PHP_EOL;
+                    error_log("erreur générale pour " . $this->url . PHP_EOL);
                     $this->filename = null;
                 }
             } else {
-                $this->extension = $output[0];
-                $this->filename = basename($output[1]);
-                $this->clearedFilename = $this->clearFilename(basename($output[1]));
+                $this->extension = $output[1];
+                $this->filename = basename($output[0]);
+                error_log("filename :  $this->filename");
+                $this->clearedFilename = $this->clearFilename(basename($output[0]));
+                error_log("filenameCleared :  $this->clearedFilename");
             }
         }
     }
@@ -467,7 +428,7 @@ function deleteDuplicateUrls(&$urls, &$formats, &$selectedElements, &$timers)
     $uniqueValues = array();
     foreach ($urls as $key => $value) {
         // Check if the value has already occurred in the array
-        if (in_array($value, $uniqueValues)) {
+        if (in_array($value, $uniqueValues) || empty($value)) {
             // If the value is a duplicate, remove it from the array
             unset($urls[$key]);
             unset($formats[$key]);
@@ -509,7 +470,7 @@ function displayVariables($urls, $formats, $timers, $selectedElements, $rename, 
 
     echo $rename;
     echo "<br>";
-    echo $ordre;
+    echo "ordre : $ordre";
     echo "<br>";
     echo "_______________________________________________________";
     echo "<br>";
@@ -517,15 +478,20 @@ function displayVariables($urls, $formats, $timers, $selectedElements, $rename, 
 
 // Start the session
 session_start();
-
+ob_start();
 
 // Get the session ID
 $sessionId = session_id() . '_' . uniqid();
 
+// Record the creation time
+$creationTime = time();
+$logEntry = "$sessionId $creationTime\n";
+file_put_contents('/var/www/html/YoutubeDL/session_log.txt', $logEntry, FILE_APPEND);
+
 $directoryPath = $sessionId;
 if (mkdir($sessionId, 0777, true)) {
 } else {
-    VideoDownloadManager::$logContent .= 'Failed to create directory for playlist ' . $url . PHP_EOL;
+    error_log('Failed to create directory for playlist ' . $url . PHP_EOL);
 }
 
 
@@ -547,27 +513,25 @@ if (!$rename) {
 }
 $ordre = $_POST['ordre']; //garder l'ordre ou non
 
-/*function handleDisconnect($sessionId, $rename)
-{
-    
-}
-
-// Register the shutdown function
-register_shutdown_function('handleDisconnect', $sessionId, $rename);*/
 
 
 
 // Call the function and pass the variables as arguments
 deleteDuplicateUrls($urls, $formats, $selectedElements, $timers);
 
-//displayVariables($urls, $formats, $timers, $selectedElements, $rename, $ordre);
+$length = count($urls);
+$ordre = ($length > 1) ? $ordre : false;
+$rename = ($length > 1) ? $rename : $sessionId;
+
+
+displayVariables($urls, $formats, $timers, $selectedElements, $rename, $ordre);
 
 // Add tasks to the download manager and validations
 $j = 0;
 for ($i = 0; $i < count($urls); $i++) {
     if (VideoDownloadManager::isValidURL($urls[$i])) {
         if (!VideoDownloadManager::isValidFormatType($formats[$i])) {
-            VideoDownloadManager::$logContent .= 'Wrong format for ' . $urls[$i]  . '( ' . $formats[$i] . ' )' . PHP_EOL;
+            error_log('Wrong format for ' . $urls[$i]  . '( ' . $formats[$i] . ' )' . PHP_EOL);
             $formats[$i] = 'besta';
         }
         if ($selectedElements[$i] != -1) {
@@ -575,21 +539,21 @@ for ($i = 0; $i < count($urls); $i++) {
                 if (VideoDownloadManager::isValidTimerFormat($timers[2 * $j + 1])) {
                     $downloadManager->addTask($urls[$i], $formats[$i], "", $timers[2 * $j + 1]);
                 } else {
-                    VideoDownloadManager::$logContent .= 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL;
+                    error_log( 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL);
                     $downloadManager->addTask($urls[$i], $formats[$i], "", "");
                 }
             } elseif (empty($timers[2 * $j + 1])) {
                 if (VideoDownloadManager::isValidTimerFormat($timers[2 * $j])) {
                     $downloadManager->addTask($urls[$i], $formats[$i], $timers[2 * $j], "");
                 } else {
-                    VideoDownloadManager::$logContent .= 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL;
+                    error_log( 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL);
                     $downloadManager->addTask($urls[$i], $formats[$i], "", "");
                 }
             } else {
                 if (VideoDownloadManager::isValidTimerFormat($timers[2 * $j]) && VideoDownloadManager::isValidTimerFormat($timers[2 * $j + 1])) {
                     $downloadManager->addTask($urls[$i], $formats[$i], $timers[2 * $j], $timers[2 * $j + 1]);
                 } else {
-                    VideoDownloadManager::$logContent .= 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL;
+                    error_log( 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL);
                     $downloadManager->addTask($urls[$i], $formats[$i], "", "");
                 }
             }
@@ -598,9 +562,7 @@ for ($i = 0; $i < count($urls); $i++) {
             $downloadManager->addTask($urls[$i], $formats[$i], "", "");
         }
     } else {
-        echo "error";
-
-        VideoDownloadManager::$logContent .= 'Wrong URL for ' . $urls[$i] . PHP_EOL;
+        error_log( 'Wrong URL for ' . $urls[$i] . PHP_EOL);
     }
 }
 
@@ -608,20 +570,29 @@ for ($i = 0; $i < count($urls); $i++) {
 $downloadManager->executeAllDownloads();
 $downloadManager->renameAndOrder($ordre);
 
+echo $downloadManager->getValidCount();
+
 if ($downloadManager->getValidCount() > 1) {
     $downloadManager->makeArchive($rename);
     //$downloadManager->download($rename . '.tar');
+    $file = $rename . '.tar';
 } else {
     $firstFilename = $downloadManager->getFirstValidDownload();
+    error_log("firstfilename : $firstFilename");
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         //$downloadManager->download($firstFilename);
+        $file = $firstFilename;
     }
 }
+echo $file;
+?>
+<form action="finaldownload.php" method="get">
+    <input type="hidden" name="file" value="<?php echo htmlspecialchars($file); ?>">
+    <input type="submit" value="Telecharger">
+</form>
+<?php
 
-$downloadManager->deleteFiles($rename);
-
-
-echo VideoDownloadManager::$logContent;
+//$downloadManager->deleteFiles($rename);
 
 
 // Flush output to make sure any progress messages are sent to the client
@@ -633,7 +604,6 @@ logs
 problème 2 cases à cocher qui s'affichent
 cacher timer si playlist
 plusieurs utilisateurs
-
 progressbar*/
 ?>
 <a href="url.php"> retour </a>

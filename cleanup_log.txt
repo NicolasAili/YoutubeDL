@@ -1,0 +1,74 @@
+
+[2024-06-24 20:28:01] Cleanup script started.
+[2024-06-24 20:28:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:28:01] Cleanup script completed.
+[2024-06-24 20:29:01] Cleanup script started.
+[2024-06-24 20:29:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:29:01] time remaining = 1719260941 - 1719260864
+[2024-06-24 20:29:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:29:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:29:01] time remaining = 1719260941 - 1719260938
+[2024-06-24 20:29:01] Cleanup script completed.
+[2024-06-24 20:30:01] Cleanup script started.
+[2024-06-24 20:30:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:30:01] time remaining = 137
+[2024-06-24 20:30:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:30:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:30:01] time remaining = 63
+[2024-06-24 20:30:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:30:01] ----------------------------------------------------
+[2024-06-24 20:30:01] Cleanup script completed.
+[2024-06-24 20:31:01] Cleanup script started.
+[2024-06-24 20:31:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:31:01] time remaining = 197
+[2024-06-24 20:31:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:31:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:31:01] time remaining = 123
+[2024-06-24 20:31:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:31:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
+[2024-06-24 20:31:01] time remaining = 56
+[2024-06-24 20:31:01] ----------------------------------------------------
+[2024-06-24 20:32:01] Cleanup script started.
+[2024-06-24 20:32:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:32:01] time remaining = 257
+[2024-06-24 20:32:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:32:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:32:01] time remaining = 183
+[2024-06-24 20:32:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:32:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
+[2024-06-24 20:32:01] time remaining = 116
+[2024-06-24 20:32:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
+[2024-06-24 20:32:01] ----------------------------------------------------
+[2024-06-24 20:33:01] Cleanup script started.
+[2024-06-24 20:33:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:33:01] time remaining = 317
+[2024-06-24 20:33:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:33:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:33:01] time remaining = 243
+[2024-06-24 20:33:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:33:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
+[2024-06-24 20:33:01] time remaining = 176
+[2024-06-24 20:33:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
+[2024-06-24 20:33:01] ----------------------------------------------------
+[2024-06-24 20:34:01] Cleanup script started.
+[2024-06-24 20:34:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:34:01] time remaining = 377
+[2024-06-24 20:34:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:34:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:34:01] time remaining = 303
+[2024-06-24 20:34:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:34:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
+[2024-06-24 20:34:01] time remaining = 236
+[2024-06-24 20:34:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
+[2024-06-24 20:34:01] ----------------------------------------------------
+[2024-06-24 20:35:01] Cleanup script started.
+[2024-06-24 20:35:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:35:01] time remaining = 437
+[2024-06-24 20:35:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
+[2024-06-24 20:35:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:35:01] time remaining = 363
+[2024-06-24 20:35:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
+[2024-06-24 20:35:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
+[2024-06-24 20:35:01] time remaining = 296
+[2024-06-24 20:35:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
+[2024-06-24 20:35:01] ----------------------------------------------------

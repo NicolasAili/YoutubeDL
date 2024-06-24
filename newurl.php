@@ -207,6 +207,7 @@
                             if (!isPlaylistActive()) {
                                 console.log("unchecking");
                                 $("#ordrediv").css("display", "none");
+                                $('#ordre').prop('checked', false);
                             }
                             // Do something when the checkbox is unchecked
                         }
@@ -224,6 +225,7 @@
                     if (!isPlaylistActive()) {
                         console.log("replacing with non playlist url");
                         $("#ordrediv").css("display", "none");
+                        $('#ordre').prop('checked', false);
                     }
                 }
             });
@@ -237,7 +239,7 @@
         var html = '';
         html += '<div id="inputFormRow">';
         html += '<div class="input-group mb-3">';
-        html += '<input type="text" name="title[]" class="form-control m-input" placeholder="Copiez un lien ici" autocomplete="off">';
+        html += '<input type="text" name="title[]" class="form-control m-input" placeholder="Copiez un lien ici" autocomplete="off" required>';
 
         html += '<select class="format-dropdown" name="format[]" style="width: 150px">' +
             '<option value="besta" data-icon="fa-solid fa-music">automatique</option>' +
@@ -297,6 +299,7 @@
             if (!isPlaylistActive()) {
                 console.log("deleting last row");
                 $("#ordrediv").css("display", "none");
+                $('#ordre').prop('checked', false);
             }
         }
     });
@@ -309,6 +312,7 @@
         $("#renamediv").css("display", "none");
         console.log("reinit");
         $("#ordrediv").css("display", "none");
+        $('#ordre').prop('checked', false);
     });
 
     //timer
