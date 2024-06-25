@@ -1,74 +1,129 @@
-
-[2024-06-24 20:28:01] Cleanup script started.
-[2024-06-24 20:28:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:28:01] Cleanup script completed.
-[2024-06-24 20:29:01] Cleanup script started.
-[2024-06-24 20:29:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:29:01] time remaining = 1719260941 - 1719260864
-[2024-06-24 20:29:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:29:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:29:01] time remaining = 1719260941 - 1719260938
-[2024-06-24 20:29:01] Cleanup script completed.
-[2024-06-24 20:30:01] Cleanup script started.
-[2024-06-24 20:30:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:30:01] time remaining = 137
-[2024-06-24 20:30:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:30:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:30:01] time remaining = 63
-[2024-06-24 20:30:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:30:01] ----------------------------------------------------
-[2024-06-24 20:30:01] Cleanup script completed.
-[2024-06-24 20:31:01] Cleanup script started.
-[2024-06-24 20:31:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:31:01] time remaining = 197
-[2024-06-24 20:31:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:31:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:31:01] time remaining = 123
-[2024-06-24 20:31:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:31:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
-[2024-06-24 20:31:01] time remaining = 56
-[2024-06-24 20:31:01] ----------------------------------------------------
-[2024-06-24 20:32:01] Cleanup script started.
-[2024-06-24 20:32:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:32:01] time remaining = 257
-[2024-06-24 20:32:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:32:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:32:01] time remaining = 183
-[2024-06-24 20:32:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:32:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
-[2024-06-24 20:32:01] time remaining = 116
-[2024-06-24 20:32:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
-[2024-06-24 20:32:01] ----------------------------------------------------
-[2024-06-24 20:33:01] Cleanup script started.
-[2024-06-24 20:33:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:33:01] time remaining = 317
-[2024-06-24 20:33:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:33:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:33:01] time remaining = 243
-[2024-06-24 20:33:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:33:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
-[2024-06-24 20:33:01] time remaining = 176
-[2024-06-24 20:33:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
-[2024-06-24 20:33:01] ----------------------------------------------------
-[2024-06-24 20:34:01] Cleanup script started.
-[2024-06-24 20:34:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:34:01] time remaining = 377
-[2024-06-24 20:34:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:34:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:34:01] time remaining = 303
-[2024-06-24 20:34:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:34:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
-[2024-06-24 20:34:01] time remaining = 236
-[2024-06-24 20:34:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
-[2024-06-24 20:34:01] ----------------------------------------------------
-[2024-06-24 20:35:01] Cleanup script started.
-[2024-06-24 20:35:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:35:01] time remaining = 437
-[2024-06-24 20:35:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d6c0c1ac9
-[2024-06-24 20:35:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:35:01] time remaining = 363
-[2024-06-24 20:35:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d70a233c4
-[2024-06-24 20:35:01] session ID : v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
-[2024-06-24 20:35:01] time remaining = 296
-[2024-06-24 20:35:01] Failed to delete session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_6679d74dec6b0
-[2024-06-24 20:35:01] ----------------------------------------------------
+[2024-06-25 03:06:01] Cleanup script started.
+[2024-06-25 03:06:01] Failed to update session log file. Error: 
+[2024-06-25 03:06:01] Cleanup script completed.
+[2024-06-25 03:07:01] Cleanup script started.
+[2024-06-25 03:07:01] Failed to update session log file. Error: 
+[2024-06-25 03:07:01] Cleanup script completed.
+[2024-06-25 03:08:01] Cleanup script started.
+[2024-06-25 03:08:01] Cleanup script completed.
+[2024-06-25 03:09:01] Cleanup script started.
+[2024-06-25 03:09:01] Cleanup script completed.
+[2024-06-25 03:10:01] Cleanup script started.
+[2024-06-25 03:10:01] Cleanup script completed.
+[2024-06-25 03:11:01] Cleanup script started.
+[2024-06-25 03:11:01] Cleanup script completed.
+[2024-06-25 03:12:01] Cleanup script started.
+[2024-06-25 03:12:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a354b55a72
+[2024-06-25 03:12:01] Time difference: 54
+[2024-06-25 03:12:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355684838
+[2024-06-25 03:12:01] Time difference: 43
+[2024-06-25 03:12:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355b9b930
+[2024-06-25 03:12:01] Time difference: 38
+[2024-06-25 03:12:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3560bea9c
+[2024-06-25 03:12:01] Time difference: 33
+[2024-06-25 03:12:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3565ddd9f
+[2024-06-25 03:12:01] Time difference: 28
+[2024-06-25 03:12:01] Cleanup script completed.
+[2024-06-25 03:13:01] Cleanup script started.
+[2024-06-25 03:13:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a354b55a72
+[2024-06-25 03:13:01] Time difference: 114
+[2024-06-25 03:13:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a354b55a72/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus: 0644
+[2024-06-25 03:13:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a354b55a72/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus
+[2024-06-25 03:13:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a354b55a72/output.txt: 0644
+[2024-06-25 03:13:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a354b55a72/output.txt
+[2024-06-25 03:13:01] Deleted session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a354b55a72
+[2024-06-25 03:13:01] Tar file does not exist: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a354b55a72.tar
+[2024-06-25 03:13:01] Removed session entry from database for session: v7d6mhjvaq4umvper78d8jdmdq_667a354b55a72
+[2024-06-25 03:13:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355684838
+[2024-06-25 03:13:01] Time difference: 103
+[2024-06-25 03:13:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355684838/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus: 0644
+[2024-06-25 03:13:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355684838/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus
+[2024-06-25 03:13:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355684838/output.txt: 0644
+[2024-06-25 03:13:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355684838/output.txt
+[2024-06-25 03:13:01] Deleted session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355684838
+[2024-06-25 03:13:01] Tar file does not exist: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355684838.tar
+[2024-06-25 03:13:01] Removed session entry from database for session: v7d6mhjvaq4umvper78d8jdmdq_667a355684838
+[2024-06-25 03:13:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355b9b930
+[2024-06-25 03:13:01] Time difference: 98
+[2024-06-25 03:13:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355b9b930/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus: 0644
+[2024-06-25 03:13:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355b9b930/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus
+[2024-06-25 03:13:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355b9b930/output.txt: 0644
+[2024-06-25 03:13:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355b9b930/output.txt
+[2024-06-25 03:13:01] Deleted session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355b9b930
+[2024-06-25 03:13:01] Tar file does not exist: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a355b9b930.tar
+[2024-06-25 03:13:01] Removed session entry from database for session: v7d6mhjvaq4umvper78d8jdmdq_667a355b9b930
+[2024-06-25 03:13:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3560bea9c
+[2024-06-25 03:13:01] Time difference: 93
+[2024-06-25 03:13:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3560bea9c/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus: 0644
+[2024-06-25 03:13:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3560bea9c/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus
+[2024-06-25 03:13:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3560bea9c/output.txt: 0644
+[2024-06-25 03:13:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3560bea9c/output.txt
+[2024-06-25 03:13:01] Deleted session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3560bea9c
+[2024-06-25 03:13:01] Tar file does not exist: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3560bea9c.tar
+[2024-06-25 03:13:01] Removed session entry from database for session: v7d6mhjvaq4umvper78d8jdmdq_667a3560bea9c
+[2024-06-25 03:13:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3565ddd9f
+[2024-06-25 03:13:01] Time difference: 88
+[2024-06-25 03:13:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3565ddd9f/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus: 0644
+[2024-06-25 03:13:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3565ddd9f/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus
+[2024-06-25 03:13:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3565ddd9f/output.txt: 0644
+[2024-06-25 03:13:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3565ddd9f/output.txt
+[2024-06-25 03:13:01] Deleted session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3565ddd9f
+[2024-06-25 03:13:01] Tar file does not exist: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a3565ddd9f.tar
+[2024-06-25 03:13:01] Removed session entry from database for session: v7d6mhjvaq4umvper78d8jdmdq_667a3565ddd9f
+[2024-06-25 03:13:01] Cleanup script completed.
+[2024-06-25 03:14:01] Cleanup script started.
+[2024-06-25 03:14:01] Cleanup script completed.
+[2024-06-25 03:15:01] Cleanup script started.
+[2024-06-25 03:15:01] Cleanup script completed.
+[2024-06-25 03:16:01] Cleanup script started.
+[2024-06-25 03:16:01] Cleanup script completed.
+[2024-06-25 03:17:01] Cleanup script started.
+[2024-06-25 03:17:01] Cleanup script completed.
+[2024-06-25 03:18:01] Cleanup script started.
+[2024-06-25 03:18:01] Cleanup script completed.
+[2024-06-25 03:19:01] Cleanup script started.
+[2024-06-25 03:19:01] Cleanup script completed.
+[2024-06-25 03:20:01] Cleanup script started.
+[2024-06-25 03:20:01] Cleanup script completed.
+[2024-06-25 03:21:01] Cleanup script started.
+[2024-06-25 03:21:01] Cleanup script completed.
+[2024-06-25 03:22:01] Cleanup script started.
+[2024-06-25 03:22:01] Cleanup script completed.
+[2024-06-25 03:23:01] Cleanup script started.
+[2024-06-25 03:23:01] Cleanup script completed.
+[2024-06-25 03:24:01] Cleanup script started.
+[2024-06-25 03:24:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a382d029b1
+[2024-06-25 03:24:01] Time difference: 36
+[2024-06-25 03:24:01] Cleanup script completed.
+[2024-06-25 03:25:01] Cleanup script started.
+[2024-06-25 03:25:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a382d029b1
+[2024-06-25 03:25:01] Time difference: 96
+[2024-06-25 03:25:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a382d029b1/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus: 0644
+[2024-06-25 03:25:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a382d029b1/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus
+[2024-06-25 03:25:01] Deleted session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a382d029b1
+[2024-06-25 03:25:01] Tar file does not exist: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a382d029b1.tar
+[2024-06-25 03:25:01] Removed session entry from database for session: v7d6mhjvaq4umvper78d8jdmdq_667a382d029b1
+[2024-06-25 03:25:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a38529ca0b
+[2024-06-25 03:25:01] Time difference: 59
+[2024-06-25 03:25:01] Cleanup script completed.
+[2024-06-25 03:26:01] Cleanup script started.
+[2024-06-25 03:26:01] Processing session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a38529ca0b
+[2024-06-25 03:26:01] Time difference: 119
+[2024-06-25 03:26:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a38529ca0b/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus: 0644
+[2024-06-25 03:26:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a38529ca0b/1 MINUTE COUNTDOWN TIMER (60 SECONDS TIMER).opus
+[2024-06-25 03:26:01] File permissions for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a38529ca0b/1 Minute Timer.opus: 0644
+[2024-06-25 03:26:01] Attempting to change ownership for /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a38529ca0b/1 Minute Timer.opus
+[2024-06-25 03:26:01] Deleted session directory: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a38529ca0b
+[2024-06-25 03:26:01] Deleted tar file: /var/www/html/YoutubeDL/v7d6mhjvaq4umvper78d8jdmdq_667a38529ca0b.tar
+[2024-06-25 03:26:01] Removed session entry from database for session: v7d6mhjvaq4umvper78d8jdmdq_667a38529ca0b
+[2024-06-25 03:26:01] Cleanup script completed.
+[2024-06-25 03:27:02] Cleanup script started.
+[2024-06-25 03:27:02] Cleanup script completed.
+[2024-06-25 03:28:01] Cleanup script started.
+[2024-06-25 03:28:01] Cleanup script completed.
+[2024-06-25 03:29:01] Cleanup script started.
+[2024-06-25 03:29:01] Cleanup script completed.
+[2024-06-25 03:30:01] Cleanup script started.
+[2024-06-25 03:30:01] Cleanup script completed.
+[2024-06-25 03:31:01] Cleanup script started.
+[2024-06-25 03:31:01] Cleanup script completed.

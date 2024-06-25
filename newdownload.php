@@ -20,11 +20,6 @@ while (ob_get_level()) {
 
 class VideoDownloadManager
 {
-    // Step 1: Define the log file path and name
-    public $logFilePath = 'logs/script_log.txt';
-    // Step 2: Create a variable to hold the log content
-    public static $logContent = '';
-
     private $tasks = [];
     private $firstValidDownload;
     private $validFilenameCount;
@@ -233,7 +228,7 @@ class VideoDownloadTask
                     $directoryPath = self::$folderId . '/' . $this->playlistName;
                     if (mkdir($directoryPath, 0777, true)) {
                     } else {
-                        error_log('Failed to create directory for playlist ' . $url . PHP_EOL);
+                        //error_log('Failed to create directory for playlist ' . $url . PHP_EOL);
                     }
                 }
             }
@@ -316,9 +311,9 @@ class VideoDownloadTask
                 . ' ' . $this->url
                 . " > $outputFile & echo $!; ";
         }
-        error_log('-----------------------');
+        /*error_log('-----------------------');
         error_log('\n');
-        error_log("download : $downloadCommand");
+        error_log("download : $downloadCommand");*/
 
         $pid = exec($downloadCommand, $outputPid);
         //error_log("pid : $pid");
@@ -327,11 +322,11 @@ class VideoDownloadTask
         //error_log($outfileFoldered);
 
         while ($this->isProcessRunning($pid)) {
-            error_log("Process is still running...\n");
+            //error_log("Process is still running...\n");
             flush();
 
             if (connection_aborted()) {
-                error_log("PHP is shutting down.");
+                //error_log("PHP is shutting down.");
                 posix_kill($pid, SIGTERM);
                 shell_exec('rm -rf /var/www/html/YoutubeDL/' . self::$folderId);
                 exit();
@@ -339,14 +334,28 @@ class VideoDownloadTask
             //error_log("flush()'d $numSleeps times. Connection aborted is now: $connAbortedStr\n");
             sleep(1);
         }
-        //error_log("DONE SLEEPING!<br>");
-        error_log("Process is over\n");
 
 
 
         $output = file_get_contents($outfileFoldered);
-        error_log("output : $output");
         $output = explode("\n", $output);
+
+
+        // Escape the path to make it safe for shell execution
+        $escapedPath = escapeshellarg($outfileFoldered);
+
+        // Construct the command to delete the file
+        $command = 'rm ' . $escapedPath;
+
+        // Execute the command
+        exec($command, $output, $return_var);
+
+        // Check if the command was successful
+        if ($return_var === 0) {
+            error_log("File deleted successfully.");
+        } else {
+            error_log("Failed to delete the file.");
+        }
 
 
         if ($this->isPlaylist == true) {
@@ -373,21 +382,19 @@ class VideoDownloadTask
                         $this->extension = $output[1];
                         $this->filename = basename($output[0]);
                         $this->clearedFilename = $this->clearFilename(basename($output[0]));
-                        error_log("téléchargement réussi en changeant de format pour " . $this->clearedFilename . PHP_EOL);
+                        //error_log("téléchargement réussi en changeant de format pour " . $this->clearedFilename . PHP_EOL);
                     } else { //erreur générale sur ce download
-                        error_log("erreur générale après erreur format pour " . $this->url . PHP_EOL);
+                        //error_log("erreur générale après erreur format pour " . $this->url . PHP_EOL);
                         $this->filename = null;
                     }
                 } else { //erreur générale sur ce download
-                    error_log("erreur générale pour " . $this->url . PHP_EOL);
+                    //error_log("erreur générale pour " . $this->url . PHP_EOL);
                     $this->filename = null;
                 }
             } else {
                 $this->extension = $output[1];
                 $this->filename = basename($output[0]);
-                error_log("filename :  $this->filename");
                 $this->clearedFilename = $this->clearFilename(basename($output[0]));
-                error_log("filenameCleared :  $this->clearedFilename");
             }
         }
     }
@@ -480,13 +487,61 @@ function displayVariables($urls, $formats, $timers, $selectedElements, $rename, 
 session_start();
 ob_start();
 
-// Get the session ID
-$sessionId = session_id() . '_' . uniqid();
+require_once 'db_connection.php';
 
-// Record the creation time
+$sessionId = session_id() . '_' . uniqid();
 $creationTime = time();
-$logEntry = "$sessionId $creationTime\n";
-file_put_contents('/var/www/html/YoutubeDL/session_log.txt', $logEntry, FILE_APPEND);
+
+$maxAttempts = 20; // Maximum number of attempts
+$attempt = 0;
+
+do {
+    $attempt++;
+
+    try {
+        // Start transaction
+        $pdo->beginTransaction();
+
+        // Insert log entry
+        $stmt = $pdo->prepare("INSERT INTO session_logs (session_id, creation_time) VALUES (:session_id, :creation_time)");
+        $stmt->bindParam(':session_id', $sessionId);
+        $stmt->bindParam(':creation_time', $creationTime);
+
+        // Execute the statement
+        if ($stmt->execute()) {
+            // Commit the transaction
+            $pdo->commit();
+
+            // Log successful write to debug log
+            error_log("Successfully wrote: $sessionId $creationTime");
+
+            // Break out of the loop if successfully written
+            break;
+        } else {
+            // Rollback the transaction in case of failure
+            $pdo->rollBack();
+            error_log("Failed to insert log entry (Attempt $attempt)");
+        }
+    } catch (PDOException $e) {
+        // Rollback the transaction in case of exception
+        $pdo->rollBack();
+        error_log("Database error: " . $e->getMessage() . " (Attempt $attempt)");
+    }
+
+    // Wait for a short period before retrying (optional)
+    usleep(100000); // 100 milliseconds
+
+} while ($attempt < $maxAttempts);
+
+if ($attempt >= $maxAttempts) {
+    error_log("Failed to write to database after $maxAttempts attempts");
+    // Handle failure to write after maximum attempts
+} else {
+    // Successfully wrote to the database
+    echo "Successfully wrote to database";
+}
+
+
 
 $directoryPath = $sessionId;
 if (mkdir($sessionId, 0777, true)) {
@@ -539,21 +594,21 @@ for ($i = 0; $i < count($urls); $i++) {
                 if (VideoDownloadManager::isValidTimerFormat($timers[2 * $j + 1])) {
                     $downloadManager->addTask($urls[$i], $formats[$i], "", $timers[2 * $j + 1]);
                 } else {
-                    error_log( 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL);
+                    error_log('Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL);
                     $downloadManager->addTask($urls[$i], $formats[$i], "", "");
                 }
             } elseif (empty($timers[2 * $j + 1])) {
                 if (VideoDownloadManager::isValidTimerFormat($timers[2 * $j])) {
                     $downloadManager->addTask($urls[$i], $formats[$i], $timers[2 * $j], "");
                 } else {
-                    error_log( 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL);
+                    error_log('Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL);
                     $downloadManager->addTask($urls[$i], $formats[$i], "", "");
                 }
             } else {
                 if (VideoDownloadManager::isValidTimerFormat($timers[2 * $j]) && VideoDownloadManager::isValidTimerFormat($timers[2 * $j + 1])) {
                     $downloadManager->addTask($urls[$i], $formats[$i], $timers[2 * $j], $timers[2 * $j + 1]);
                 } else {
-                    error_log( 'Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL);
+                    error_log('Wrong timer for ' . $urls[$i] . '( ' . $timers[2 * $j] . ' - ' . $timers[2 * $j + 1] . ' )' . PHP_EOL);
                     $downloadManager->addTask($urls[$i], $formats[$i], "", "");
                 }
             }
@@ -562,7 +617,7 @@ for ($i = 0; $i < count($urls); $i++) {
             $downloadManager->addTask($urls[$i], $formats[$i], "", "");
         }
     } else {
-        error_log( 'Wrong URL for ' . $urls[$i] . PHP_EOL);
+        error_log('Wrong URL for ' . $urls[$i] . PHP_EOL);
     }
 }
 
@@ -570,7 +625,6 @@ for ($i = 0; $i < count($urls); $i++) {
 $downloadManager->executeAllDownloads();
 $downloadManager->renameAndOrder($ordre);
 
-echo $downloadManager->getValidCount();
 
 if ($downloadManager->getValidCount() > 1) {
     $downloadManager->makeArchive($rename);
@@ -578,7 +632,6 @@ if ($downloadManager->getValidCount() > 1) {
     $file = $rename . '.tar';
 } else {
     $firstFilename = $downloadManager->getFirstValidDownload();
-    error_log("firstfilename : $firstFilename");
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         //$downloadManager->download($firstFilename);
         $file = $firstFilename;
@@ -600,10 +653,13 @@ flush();
 // Terminate script execution
 exit;
 /*
-logs
+problème ordre qui s'affiche pas
+pouvoir ajouter plusieurs liens simultanément
 problème 2 cases à cocher qui s'affichent
 cacher timer si playlist
-plusieurs utilisateurs
-progressbar*/
+progressbar
+tuto en bas + FAQ
+night mode
+*/
 ?>
 <a href="url.php"> retour </a>
