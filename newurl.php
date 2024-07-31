@@ -224,8 +224,10 @@
                     }
                     if (!isPlaylistActive()) {
                         console.log("replacing with non playlist url");
-                        $("#ordrediv").css("display", "none");
-                        $('#ordre').prop('checked', false);
+                        if ($("#inputFormRow").length == 0) {
+                            $("#ordrediv").css("display", "none");
+                            $('#ordre').prop('checked', false);
+                        }
                     }
                 }
             });

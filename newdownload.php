@@ -13,11 +13,6 @@ if (!defined('SIGTERM')) {
     define('SIGTERM', 15);
 }
 
-while (ob_get_level()) {
-    ob_get_contents();
-    ob_end_clean();
-}
-
 class VideoDownloadManager
 {
     private $tasks = [];
@@ -205,6 +200,7 @@ class VideoDownloadTask
 
     private static $folderId;
 
+
     public static function setFolderId($var)
     {
         self::$folderId = $var;
@@ -270,15 +266,8 @@ class VideoDownloadTask
         }
     }
 
-    private function isProcessRunning($pid)
+    private function getOutputfilePath()
     {
-        $result = shell_exec(sprintf("ps %d", $pid));
-        return (count(preg_split("/\n/", $result)) > 2);
-    }
-
-    public function executeDownload()
-    {
-
         $outputFile = "output.txt";
 
         if ($this->isPlaylist == true && $this->isPlaylistValid == true) {
@@ -289,66 +278,55 @@ class VideoDownloadTask
         } else {
             $outfileFoldered = self::$folderId . '/' . $outputFile;
         }
+        return $outfileFoldered;
+    }
 
-        //commande de téléchargement
-        if ($this->isPlaylist == true && $this->isPlaylistValid == true) {
-            $downloadCommand = "cd " . self::$folderId . "/{$playlistNameEscaped} && yt-dlp --no-warnings --print after_move:filepath" . ($this->formatType == 'audio' ? ' -x' : '')
-                . ($this->formatType == 'audio' && $this->format != 'besta'
-                    ? ' --audio-format ' . $this->format
-                    : ($this->formatType == 'video' && $this->format != 'bestv'
-                        ? ' -f ' . $this->format
-                        : ''))
-                . ' ' . $this->url
-                . " > $outputFile & echo $!; ";
-        } else {
-            $downloadCommand = 'cd ' . self::$folderId . ' && yt-dlp --no-warnings --print after_move:filepath,ext' . ($this->formatType == 'audio' ? ' -x' : '')
-                . ($this->formatType == 'audio' && $this->format != 'besta'
-                    ? ' --audio-format ' . $this->format
-                    : ($this->formatType == 'video' && $this->format != 'bestv'
-                        ? ' -f ' . $this->format
-                        : ''))
-                . ($this->hasTimer ? ' --download-sections *' . $this->timerBegin . '-' . $this->timerEnd . ' --force-keyframes-at-cuts' : '')
-                . ' ' . $this->url
-                . " > $outputFile & echo $!; ";
-        }
-        /*error_log('-----------------------');
-        error_log('\n');
-        error_log("download : $downloadCommand");*/
+    private function isProcessRunning($pid)
+    {
+        $result = shell_exec(sprintf("ps %d", $pid));
+        return (count(preg_split("/\n/", $result)) > 2);
+    }
 
+    private function executeDownloadCommand($downloadCommand)
+    {
+        error_log("download : $downloadCommand");
         $pid = exec($downloadCommand, $outputPid);
-        //error_log("pid : $pid");
 
-        $isDownloadOver = false;
-        //error_log($outfileFoldered);
+        while (ob_get_level()) {
+            ob_get_contents();
+            ob_end_clean();
+        }
 
         while ($this->isProcessRunning($pid)) {
-            //error_log("Process is still running...\n");
+            error_log("process is running : $pid");
+            ob_flush();
             flush();
 
             if (connection_aborted()) {
-                //error_log("PHP is shutting down.");
+                error_log("PHP is shutting down.");
                 posix_kill($pid, SIGTERM);
-                shell_exec('rm -rf /var/www/html/YoutubeDL/' . self::$folderId);
+                error_log("shutting down : $pid");
                 exit();
             }
-            //error_log("flush()'d $numSleeps times. Connection aborted is now: $connAbortedStr\n");
             sleep(1);
         }
+        error_log("log : " . print_r($outputPid, true));
+    }
 
-
-
-        $output = file_get_contents($outfileFoldered);
+    private function processAndDeleteFile($filePath)
+    {
+        // Read the file contents
+        $output = file_get_contents($filePath);
         $output = explode("\n", $output);
 
-
         // Escape the path to make it safe for shell execution
-        $escapedPath = escapeshellarg($outfileFoldered);
+        $escapedPath = escapeshellarg($filePath);
 
         // Construct the command to delete the file
         $command = 'rm ' . $escapedPath;
 
         // Execute the command
-        exec($command, $output, $return_var);
+        exec($command, $execOutput, $return_var);
 
         // Check if the command was successful
         if ($return_var === 0) {
@@ -357,41 +335,56 @@ class VideoDownloadTask
             error_log("Failed to delete the file.");
         }
 
+        // Return the file contents as an array
+        return $output;
+    }
 
+    private function handleDownloadErrors($output, $wasAlreadyChecked)
+    {
         if ($this->isPlaylist == true) {
             foreach ($output as $item) {
-                $this->playlistFilesname[] = basename($item);
-                $this->clearedPlaylistFilesname[] = $this->clearFilename(basename($item));
-                //error_log($this->clearFilename(basename($item)));
+                if (strpos($item, 'ERROR') === 0) {
+                    // Match the YouTube video ID and capture the sentence after the matched value
+                    if (preg_match('/([^\]]{11}): ([^.]+)\./', $item, $matches)) {
+                        $videoId = $matches[1];
+                        $firstSentence = $matches[2];
+                        echo "There was a problem with the following download: youtube.com/watch?v=" . $videoId . " (" . $firstSentence . ")\n";
+                        echo "<br>";
+                    }
+                } else if (!empty($item)) {
+                    $this->playlistFilesname[] = basename($item);
+                    $this->clearedPlaylistFilesname[] = $this->clearFilename(basename($item));
+                }
             }
-        }
+        } else {
+            if (strpos($output[0], 'ERROR') === 0) {
+                $errorMsg = substr($output[0], 7); // 5 is the length of 'ERROR'
+                if ($wasAlreadyChecked) {
+                    echo "Il y a eu un problème avec le téléchargement suivant $this->url ($errorMsg)";
+                    $this->filename = null;
+                } else {
+                    if (strpos($output[0], 'Requested format is not available') !== false) {
+                        echo "Le format n'est pas disponible pour ce téléchargement : $this->url, le format par défaut sera sélectionné";
+                        $downloadCommand = 'cd ' . self::$folderId . ' && yt-dlp'
+                            . ($this->formatType == 'audio' ? ' -x' : '')
+                            . ($this->hasTimer
+                                ? ' --download-sections *' . $this->timerBegin . '-' . $this->timerEnd . ' --force-keyframes-at-cuts'
+                                : '')
+                            . ' --print after_move:filepath,ext'
+                            . ' ' . $this->url
+                            . " > output.txt 2>&1 & echo $!;";
 
-        //s'il y a une erreur
-        if ($this->isPlaylist != true) {
-            if (empty($output)) {
-                $error = $this->handleErrors($output, $this->formatType);
-                if ($error) {
-                    //on retente le download avec le meilleur format disponible
-                    $downloadCommand = 'cd ' . self::$folderId . ' && yt-dlp' . ($this->formatType == 'audio' ? ' -x' : '') . ' ' . $this->url
-                        . ($this->hasTimer ? ' --download-sections *' . $this->timerBegin . '-' . $this->timerEnd . ' --force-keyframes-at-cuts' : '')
-                        . ' --print after_move:filepath,ext';
-
-                    exec($downloadCommand, $output, $retval); //telecharge l'audio
-
-                    if (!empty($output)) {
-                        $this->extension = $output[1];
-                        $this->filename = basename($output[0]);
-                        $this->clearedFilename = $this->clearFilename(basename($output[0]));
-                        //error_log("téléchargement réussi en changeant de format pour " . $this->clearedFilename . PHP_EOL);
-                    } else { //erreur générale sur ce download
-                        //error_log("erreur générale après erreur format pour " . $this->url . PHP_EOL);
+                        $this->executeDownloadCommand($downloadCommand);
+                        $outfileFoldered = $this->getOutputfilePath();
+                        $output = $this->processAndDeleteFile($outfileFoldered);
+                        $this->handleDownloadErrors($output, true);
+                    } else {
+                        echo "Il y a eu un problème avec le téléchargement suivant $this->url ($errorMsg)";
                         $this->filename = null;
                     }
-                } else { //erreur générale sur ce download
-                    //error_log("erreur générale pour " . $this->url . PHP_EOL);
-                    $this->filename = null;
                 }
             } else {
+                echo "The string does not start with 'ERROR'.";
                 $this->extension = $output[1];
                 $this->filename = basename($output[0]);
                 $this->clearedFilename = $this->clearFilename(basename($output[0]));
@@ -399,25 +392,47 @@ class VideoDownloadTask
         }
     }
 
-    public function handleErrors(array $output, string $formatType)
+    public function executeDownload()
     {
-        $downloadCommand = 'cd ' . self::$folderId . ' && yt-dlp' . ($this->formatType == 'audio' ? ' -x' : '') . ' ' . $this->url
-            . ($this->formatType == 'audio' && $this->format != 'besta'
-                ? ' --audio-format ' . $this->format
-                : ($this->formatType == 'video' && $this->format != 'bestv'
-                    ? ' -f ' . $this->format
-                    : ''))
-            . ($this->hasTimer ? ' --download-sections *' . $this->timerBegin . '-' . $this->timerEnd . ' --force-keyframes-at-cuts' : '')
-            . ' 2>&1';
-        exec($downloadCommand, $output, $retval); //telecharge la video 
+        $outputFile = "output.txt";
 
-        $errorMessage = 'Requested format is not available';
-        foreach ($output as $line) {
-            if (strpos($line, $errorMessage) !== false) {
-                return true;
-            }
+        if ($this->isPlaylist == true && $this->isPlaylistValid == true) {
+            $playlistNameEscapedCmd = escapeshellcmd($this->playlistName);
+            $playlistNameEscaped = str_replace(' ', '\ ', $playlistNameEscapedCmd);
+            $outfileFoldered = self::$folderId . '/' . $playlistNameEscapedCmd . '/' . $outputFile;
+        } else {
+            $outfileFoldered = self::$folderId . '/' . $outputFile;
         }
-        return false;
+
+        //commande de téléchargement
+        if ($this->isPlaylist == true && $this->isPlaylistValid == true) {
+            $downloadCommand = "cd " . self::$folderId . "/{$playlistNameEscaped} && yt-dlp --no-warnings --print after_move:filepath"
+                . ($this->formatType == 'audio' ? ' -x' : '')
+                . ($this->formatType == 'audio' && $this->format != 'besta'
+                    ? ' --audio-format ' . $this->format
+                    : ($this->formatType == 'video' && $this->format != 'bestv'
+                        ? ' -f ' . $this->format
+                        : ''))
+                . ' ' . $this->url
+                . " > $outputFile 2>&1 & echo $!; ";
+        } else {
+            $downloadCommand = 'cd ' . self::$folderId . ' && yt-dlp --no-warnings --print after_move:filepath,ext'
+                . ($this->formatType == 'audio' ? ' -x' : '')
+                . ($this->formatType == 'audio' && $this->format != 'besta'
+                    ? ' --audio-format ' . $this->format
+                    : ($this->formatType == 'video' && $this->format != 'bestv'
+                        ? ' -f ' . $this->format
+                        : ''))
+                . ($this->hasTimer ? ' --download-sections *' . $this->timerBegin . '-' . $this->timerEnd . ' --force-keyframes-at-cuts' : '')
+                . ' ' . $this->url
+                . " > $outputFile 2>&1 & echo $!;";
+        }
+
+        $this->executeDownloadCommand($downloadCommand);
+
+        $output = $this->processAndDeleteFile($outfileFoldered);
+
+        $this->handleDownloadErrors($output, false);
     }
 
     public function clearFilename($filename)
@@ -462,26 +477,6 @@ function deleteDuplicateUrls(&$urls, &$formats, &$selectedElements, &$timers)
     }
 }
 
-function displayVariables($urls, $formats, $timers, $selectedElements, $rename, $ordre)
-{
-    print_r($urls);
-    echo "<br>";
-    print_r($formats);
-    echo "<br>";
-
-    print_r($timers);
-    echo "<br>";
-
-    print_r($selectedElements);
-    echo "<br>";
-
-    echo $rename;
-    echo "<br>";
-    echo "ordre : $ordre";
-    echo "<br>";
-    echo "_______________________________________________________";
-    echo "<br>";
-}
 
 // Start the session
 session_start();
@@ -539,6 +534,7 @@ if ($attempt >= $maxAttempts) {
 } else {
     // Successfully wrote to the database
     echo "Successfully wrote to database";
+    echo "<br>";
 }
 
 
@@ -579,7 +575,6 @@ $ordre = ($length > 1) ? $ordre : false;
 $rename = ($length > 1) ? $rename : $sessionId;
 
 
-displayVariables($urls, $formats, $timers, $selectedElements, $rename, $ordre);
 
 // Add tasks to the download manager and validations
 $j = 0;

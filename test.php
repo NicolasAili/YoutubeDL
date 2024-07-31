@@ -1,38 +1,94 @@
 <?php
-error_log('-----------------------' . "\n");
+class DestructTester {
+    private $fileHandle;
 
-// Generate a unique session ID
-$sessionId = session_id() . '_' . uniqid();
-$directoryPath = $sessionId;
+    public function __construct($fileHandle){
+        // fileHandle that we log to
+        $this->fileHandle = $fileHandle;
+        // call $this->onShutdown() when PHP is shutting down.
+        register_shutdown_function(array($this, "onShutdown"));
+    }
 
-// Create the directory for the session
-if (mkdir($sessionId, 0777, true)) {
-    error_log('Directory created: ' . $sessionId . PHP_EOL);
-} else {
-    error_log('Failed to create directory: ' . $sessionId . PHP_EOL);
+    public function onShutdown() {
+        $isAborted = connection_aborted();
+        fwrite($this->fileHandle, "PHP is shutting down. isAborted: $isAborted\n");
+
+        // NOTE
+        // If connection_aborted() AND ignore_user_abort = false, PHP will immediately terminate
+        // this function when it encounters flush. This means your shutdown functions can end
+        // prematurely if: connection is aborted, ignore_user_abort=false, and you try to flush().
+        echo "Test.";
+        flush();
+        fwrite($this->fileHandle, "This was written after a flush.\n");
+    }
+    public function __destruct() {
+        $isAborted = connection_aborted();
+        fwrite($this->fileHandle, "DestructTester is getting destructed. isAborted: $isAborted\n");
+    }
 }
 
-chmod($sessionId, 0777);
+// Create a DestructTester
+// It'll log to our file on PHP shutdown and __destruct().
+$fileHandle = fopen("/path/to/destruct-tester-log.txt", "a+");
+fwrite($fileHandle, "---BEGINNING TEST---\n");
+$dt = new DestructTester($fileHandle);
 
-// Construct the download command
-$playlistUrl = 'https://www.youtube.com/watch?v=8p5X3C4jVHg&list=PL68pzcNEdQh_28vxrr7wXBVO7PKqCplJI';
-$downloadCommand = "cd $sessionId && yt-dlp --no-warnings --print after_move:filepath,ext -x $playlistUrl > output.txt 2>&1 || touch output.txt & echo $!";
+// Set this value to see how the logs end up changing
+// ignore_user_abort(true);
 
-// Execute the command and capture output and errors
-$output = [];
-$return_var = 0;
-exec($downloadCommand, $output, $return_var);
-
-// Log the entire output for debugging
-error_log('Output from yt-dlp command: ' . implode("\n", $output) . PHP_EOL);
-
-// Check for errors
-if ($return_var !== 0) {
-    error_log('Error executing command: ' . implode("\n", $output) . PHP_EOL);
-} else {
-    // Command executed successfully, log PID
-    $pid = isset($output[0]) ? $output[0] : null;
-    error_log('PID of the background process: ' . $pid . PHP_EOL);
+// Remove any buffers so that PHP attempts to send data on flush();
+while (ob_get_level()){
+    ob_get_contents();
+    ob_end_clean();
 }
 
+// Let's loop for 10 seconds
+//   If ignore_user_abort=true:
+//      This will continue to run regardless.
+//   If ignore_user_abort=false:
+//      This will immediate terminate when the user disconnects and PHP tries to flush();
+//      PHP will begin its shutdown process.
+// In either case, connection_aborted() should subsequently return "true" after the user
+// has disconnected (hit STOP button in browser), AND after PHP has attempted to flush().
+$numSleeps = 0;
+while ($numSleeps++ < 10) {
+    $connAbortedStr = connection_aborted() ? "YES" : "NO";
+    $str = "Slept $numSleeps times. Connection aborted: $connAbortedStr";
+    echo "$str<br>";
+    // If ignore_user_abort = false, script will terminate right here.
+    // Shutdown functions will being.
+    // Otherwise, script will continue for all 10 loops and then shutdown.
+    flush();
+
+    $connAbortedStr = connection_aborted() ? "YES" : "NO";
+    fwrite($fileHandle, "flush()'d $numSleeps times. Connection aborted is now: $connAbortedStr\n");
+    sleep(1);
+}
+echo "DONE SLEEPING!<br>";
+die;
+
+
+/*
+function displayVariables($urls, $formats, $timers, $selectedElements, $rename, $ordre)
+{
+    print_r($urls);
+    echo "<br>";
+    print_r($formats);
+    echo "<br>";
+
+    print_r($timers);
+    echo "<br>";
+
+    print_r($selectedElements);
+    echo "<br>";
+
+    echo $rename;
+    echo "<br>";
+    echo "ordre : $ordre";
+    echo "<br>";
+    echo "_______________________________________________________";
+    echo "<br>";
+}
+displayVariables($urls, $formats, $timers, $selectedElements, $rename, $ordre);
+*/
 ?>

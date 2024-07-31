@@ -62,7 +62,7 @@ function deleteDirectory($dir) {
 }
 
 $currentTime = time();
-$expireTime = 5400; // 90 minutes in seconds
+$expireTime = 600; // 90 minutes in seconds
 
 writeToLog("Cleanup script started.");
 
