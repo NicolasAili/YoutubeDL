@@ -13,6 +13,8 @@ if (!defined('SIGTERM')) {
     define('SIGTERM', 15);
 }
 
+
+
 class VideoDownloadManager
 {
     private $tasks = [];
@@ -93,6 +95,7 @@ class VideoDownloadManager
     public function executeAllDownloads()
     {
         foreach ($this->tasks as $task) {
+            error_log(var_export($task, true));
             $task->executeDownload();
         }
     }
@@ -100,10 +103,16 @@ class VideoDownloadManager
     public function renameAndOrder($order)
     {
         $i = 0;
+        $v = 0;
+        foreach ($this->tasks as $task) {
+            if ($task->filename) {
+                $v++;
+            }
+        }
         foreach ($this->tasks as $task) {
             if ($task->filename) {
                 $newfilename = $task->clearedFilename;
-                if ($order) {
+                if ($order && $v > 1) {
                     if ($i < 10) {
                         $j = '0' . strval($i); //pour les fichier 1 à 9 on met 00,01,02...
                     } else {
@@ -114,19 +123,19 @@ class VideoDownloadManager
                 rename(self::$folderId . '/' . $task->filename, self::$folderId . '/' . $newfilename); //on renomme
                 $i++;
             } elseif ($task->isPlaylist == true && $task->isPlaylistValid == true) {
-                $i = 0;
+                $k = 0;
                 foreach ($task->playlistFilesname as $filename) {
-                    $newfilename = $task->clearedPlaylistFilesname[$i];
+                    $newfilename = $task->clearedPlaylistFilesname[$k];
                     if ($order) {
-                        if ($i < 10) {
-                            $j = '0' . strval($i); //pour les fichier 1 à 9 on met 00,01,02...
+                        if ($k < 10) {
+                            $j = '0' . strval($k); //pour les fichier 1 à 9 on met 00,01,02...
                         } else {
-                            $j = strval($i); //sinon juste 10,11,12...
+                            $j = strval($k); //sinon juste 10,11,12...
                         }
                         $newfilename = $j . ' - ' . $newfilename; //on met au format "numero - nomfichier"
                     }
                     rename(self::$folderId . '/' . $task->playlistName . '/' . $filename, self::$folderId . '/' . $task->playlistName . '/' . $newfilename);
-                    $i++;
+                    $k++;
                 }
             }
         }
@@ -153,8 +162,9 @@ class VideoDownloadManager
 
     public function makeArchive($rename)
     {
-        $escapedRename = escapeshellarg($rename);
-        if ($rename == self::$folderId) {
+        $escapedRename = '';
+        $return = '';
+        /*if ($rename == self::$folderId) {
             $makeArchiveCommand = 'tar -cvf ' . self::$folderId . '.tar ' . self::$folderId;
             shell_exec($makeArchiveCommand);
         } else {
@@ -169,21 +179,46 @@ class VideoDownloadManager
             // Rename the directory back
             $renameBackCommand = "mv {$escapedRename} " . self::$folderId;
             shell_exec($renameBackCommand);
-        }
-    }
+        }*/
 
-    public function deleteFiles($rename)
-    {
-        shell_exec('rm -rf /var/www/html/YoutubeDL/' . self::$folderId);
-        if ($this->validFilenameCount > 1) {
-            shell_exec('rm -f "/var/www/html/YoutubeDL/' . $rename . '.tar"');
+        $renamedFolder = 'telechargement';
+
+        if ($rename != self::$folderId) {
+            $renamedFolder = escapeshellarg($rename);
         }
+
+        // Build the tar command
+        $archiveName = self::$folderId . '/' . 'telechargement.tar';
+        $folderToArchive = self::$folderId;
+
+        $command = "tar -cvf $archiveName --transform 's|^$folderToArchive|$renamedFolder|' $folderToArchive";
+
+        // Execute the tar command
+        exec($command, $output, $return_var);
+
+        // Create the archive
+        /*$makeArchiveCommand = 'tar -cvf ' . self::$folderId . '/' . 'telechargement.tar ' . self::$folderId;
+        shell_exec($makeArchiveCommand);*/
+
+        if ($rename != self::$folderId) {
+            $escapedRename = escapeshellarg($rename);
+            $oldName = self::$folderId . '/' . 'telechargement.tar';
+            $newName = self::$folderId . '/' . "{$escapedRename}.tar";
+            // Rename tar file
+            $renameBackCommand = "mv $oldName $newName";
+            shell_exec($renameBackCommand);
+            $return = self::$folderId . '/' . "{$rename}.tar";
+        } else {
+            $return = self::$folderId . '/' . 'telechargement.tar';
+        }
+        return $return;
     }
 }
 
 class VideoDownloadTask
 {
     private $url;
+    private $identifier;
     public $isPlaylist;
     public $isPlaylistValid;
     public $playlistName;
@@ -220,12 +255,14 @@ class VideoDownloadTask
                 if (!empty($output)) {
                     $error = 0;
                     $this->playlistName = $output[0];
+                    error_log($output[0]);
 
                     $directoryPath = self::$folderId . '/' . $this->playlistName;
                     if (mkdir($directoryPath, 0777, true)) {
                     } else {
                         //error_log('Failed to create directory for playlist ' . $url . PHP_EOL);
                     }
+                    break;
                 }
             }
             if ($error == 0) {
@@ -233,6 +270,13 @@ class VideoDownloadTask
             } else {
                 $this->isPlaylistValid = false;
             }
+        } else {
+            preg_match('/[?&]v=([^&]+)/', $url, $matches);
+            error_log('matches ::::::::::::');
+            error_log($url);
+            error_log($matches[1]);
+            $this->identifier = $matches[1] ?? null;
+            error_log($this->identifier);
         }
         $this->format = $format;
         $audioFormats = ['besta', 'aac', 'flac', 'mp3', 'm4a', 'opus', 'vorbis', 'wav'];
@@ -264,6 +308,7 @@ class VideoDownloadTask
         } else {
             $this->hasTimer = 1;
         }
+        $this->setupProgressBar();
     }
 
     private function getOutputfilePath()
@@ -276,7 +321,7 @@ class VideoDownloadTask
             $playlistNameEscaped = str_replace(' ', '\ ', $playlistNameEscapedCmd);
             $outfileFoldered = self::$folderId . '/' . $playlistNameEscapedCmd . '/' . $outputFile;
         } else {
-            $outfileFoldered = self::$folderId . '/' . $outputFile;
+            $outfileFoldered = self::$folderId . '/' . $this->identifier . '.txt';
         }
         return $outfileFoldered;
     }
@@ -287,34 +332,149 @@ class VideoDownloadTask
         return (count(preg_split("/\n/", $result)) > 2);
     }
 
+    private function setupProgressBar()
+    {
+        echo '<style>
+        .progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+        }
+        .progress-bar-fill {
+            height: 20px;
+            width: 0%;
+            background-color: #4caf50;
+            text-align: center;
+            color: black;
+        }
+        </style>';
+        echo '<script>
+        function updateProgressBar(percentage) {
+            const progressBar = document.getElementById("progress-bar-fill");
+            progressBar.style.width = percentage + "%";
+            progressBar.textContent = percentage + "%";
+        }
+        </script>';
+    }
+
+
+    /*private function addProgressBar($identifier, $videoTitle)
+    {
+        echo '<div>
+                Title
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" id="progress-bar-fill">0%</div>
+                </div>
+            </div>';
+    }*/
+    private function addProgressBar()
+    {
+        echo '<div>
+                Title
+                <div class="progress-bar">
+                    <div class="progress-bar-fill" id="progress-bar-fill">0%</div>
+                </div>
+            </div>';
+    }
+
+    private function updateProgressBar($value)
+    {
+        echo 'value :' . $value;
+        echo '<br>';
+        echo '<script>updateProgressBar(' . json_encode($value) . ');</script>';
+    }
+
+    private function readProgressFile($outputFilePathProgress)
+    {
+        $handle = fopen($outputFilePathProgress, 'r');
+            $lastLine = '';
+
+            if ($handle) {
+                // Seek to the end of the file
+                fseek($handle, 0, SEEK_END);
+                $position = ftell($handle);
+
+                // Loop backwards until a newline is found or start of file is reached
+                while ($position > 0) {
+                    fseek($handle, --$position, SEEK_SET);
+                    $char = fgetc($handle);
+
+                    if ($char === "\n" && strlen($lastLine) > 0) {
+                        break;
+                    }
+
+                    $lastLine = $char . $lastLine;
+                }
+                fclose($handle);
+
+                // Trim any whitespace characters from the line
+                $lastLine = trim($lastLine);
+                echo $lastLine;
+
+                // Extract the percentage value using a regular expression
+                if (preg_match('/\[download\]\s+(\d+(\.\d+)?)%\s+of[^\(]*$/', $lastLine, $matches)) {
+                    $percentage = $matches[1]; // Should return the matched percentage value
+                    $percentageInt = floor($percentage);
+                    echo 'percentage :' . $percentageInt;
+                    // Inside the while loop, after setting $percentageInt
+                    //$this->updateProgressBar($percentageInt);
+                } else {
+                    echo 'No percentage found';
+                }
+                echo "<br>";
+            } else {
+                echo "Unable to open the file.";
+            }
+        /*
+        0) //on utilise l'identifiant des vidéos et on écrit un fichier pour chaque task
+        1) ignorer ligne avec 'frag'
+        3) on va chercher dans le fichier des identifiants entre crochet [] et les compter
+        si on en trouve un, on crée une nouvelle progress bar 
+        4) il faut une variable "globale" qui permet de gérer le compte des fichiers téléchargés
+        5) il faudra un peu revoir la logique pour les noms des fichiers vu que dans output.txt on aura plusieurs noms de fichier
+        */
+    }
+
     private function executeDownloadCommand($downloadCommand)
     {
-        error_log("download : $downloadCommand");
+        $outputFilePathProgress = $this->getOutputfilePath();
         $pid = exec($downloadCommand, $outputPid);
-
         while (ob_get_level()) {
             ob_get_contents();
+            ob_flush();
             ob_end_clean();
         }
 
+        //$this->addProgressBar();
+
         while ($this->isProcessRunning($pid)) {
-            error_log("process is running : $pid");
             ob_flush();
             flush();
+            // Open the file in read mode
+
+            $this->readProgressFile($outputFilePathProgress);
 
             if (connection_aborted()) {
-                error_log("PHP is shutting down.");
                 posix_kill($pid, SIGTERM);
-                error_log("shutting down : $pid");
                 exit();
             }
             sleep(1);
         }
-        error_log("log : " . print_r($outputPid, true));
+        //$this->updateProgressBar(100);
     }
 
     private function processAndDeleteFile($filePath)
     {
+        // Read all lines of the file into an array
+        $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        // Filter out lines that start with '[download'
+        $filteredLines = array_filter($lines, function ($line) {
+            return strpos($line, '[download]') !== 0;
+        });
+
+        // Overwrite the file with the filtered lines
+        //file_put_contents($filePath, implode(PHP_EOL, $filteredLines));
+
         // Read the file contents
         $output = file_get_contents($filePath);
         $output = explode("\n", $output);
@@ -326,15 +486,14 @@ class VideoDownloadTask
         $command = 'rm ' . $escapedPath;
 
         // Execute the command
-        exec($command, $execOutput, $return_var);
+        /*exec($command, $execOutput, $return_var);
 
         // Check if the command was successful
         if ($return_var === 0) {
             error_log("File deleted successfully.");
         } else {
             error_log("Failed to delete the file.");
-        }
-
+        }*/
         // Return the file contents as an array
         return $output;
     }
@@ -365,16 +524,17 @@ class VideoDownloadTask
                 } else {
                     if (strpos($output[0], 'Requested format is not available') !== false) {
                         echo "Le format n'est pas disponible pour ce téléchargement : $this->url, le format par défaut sera sélectionné";
-                        $downloadCommand = 'cd ' . self::$folderId . ' && yt-dlp'
+                        $downloadCommand = 'cd ' . self::$folderId . ' && yt-dlp --no-warnings'
                             . ($this->formatType == 'audio' ? ' -x' : '')
                             . ($this->hasTimer
                                 ? ' --download-sections *' . $this->timerBegin . '-' . $this->timerEnd . ' --force-keyframes-at-cuts'
                                 : '')
                             . ' --print after_move:filepath,ext'
                             . ' ' . $this->url
-                            . " > output.txt 2>&1 & echo $!;";
+                            . " > " . $this->identifier . ".txt 2>&1 & echo $!;";
 
                         $this->executeDownloadCommand($downloadCommand);
+
                         $outfileFoldered = $this->getOutputfilePath();
                         $output = $this->processAndDeleteFile($outfileFoldered);
                         $this->handleDownloadErrors($output, true);
@@ -395,13 +555,14 @@ class VideoDownloadTask
     public function executeDownload()
     {
         $outputFile = "output.txt";
+        $outputFileSingle = $this->identifier . '.txt';
 
         if ($this->isPlaylist == true && $this->isPlaylistValid == true) {
             $playlistNameEscapedCmd = escapeshellcmd($this->playlistName);
             $playlistNameEscaped = str_replace(' ', '\ ', $playlistNameEscapedCmd);
             $outfileFoldered = self::$folderId . '/' . $playlistNameEscapedCmd . '/' . $outputFile;
         } else {
-            $outfileFoldered = self::$folderId . '/' . $outputFile;
+            $outfileFoldered = self::$folderId . '/' . $outputFileSingle;
         }
 
         //commande de téléchargement
@@ -416,7 +577,7 @@ class VideoDownloadTask
                 . ' ' . $this->url
                 . " > $outputFile 2>&1 & echo $!; ";
         } else {
-            $downloadCommand = 'cd ' . self::$folderId . ' && yt-dlp --no-warnings --print after_move:filepath,ext'
+            $downloadCommand = 'cd ' . self::$folderId . ' && yt-dlp --progress --newline --no-warnings --print after_move:filepath,ext'
                 . ($this->formatType == 'audio' ? ' -x' : '')
                 . ($this->formatType == 'audio' && $this->format != 'besta'
                     ? ' --audio-format ' . $this->format
@@ -425,7 +586,7 @@ class VideoDownloadTask
                         : ''))
                 . ($this->hasTimer ? ' --download-sections *' . $this->timerBegin . '-' . $this->timerEnd . ' --force-keyframes-at-cuts' : '')
                 . ' ' . $this->url
-                . " > $outputFile 2>&1 & echo $!;";
+                . " > $outputFileSingle 2>&1 & echo $!;";
         }
 
         $this->executeDownloadCommand($downloadCommand);
@@ -485,6 +646,22 @@ ob_start();
 require_once 'db_connection.php';
 
 $sessionId = session_id() . '_' . uniqid();
+
+
+$urls = $_POST['title']; //liste des urls
+$formats = $_POST['format']; //format pour chaque url
+$timers = $_POST['posTimer']; //récupère les sections debut et fin
+$selectedElements = $_POST['selectedElements']; //récupère les liens concernés par un timer
+$rename = $_POST['rename']; //if multiple files specified name for renaming tar containing files
+$tarfilename = '';
+if (!$rename) {
+    $rename = $sessionId;
+    $tarfilename = $sessionId;
+} else {
+    $tarfilename = $rename;
+}
+$ordre = $_POST['ordre']; //garder l'ordre ou non
+
 $creationTime = time();
 
 $maxAttempts = 20; // Maximum number of attempts
@@ -506,16 +683,10 @@ do {
         if ($stmt->execute()) {
             // Commit the transaction
             $pdo->commit();
-
-            // Log successful write to debug log
-            error_log("Successfully wrote: $sessionId $creationTime");
-
-            // Break out of the loop if successfully written
             break;
         } else {
             // Rollback the transaction in case of failure
             $pdo->rollBack();
-            error_log("Failed to insert log entry (Attempt $attempt)");
         }
     } catch (PDOException $e) {
         // Rollback the transaction in case of exception
@@ -531,12 +702,7 @@ do {
 if ($attempt >= $maxAttempts) {
     error_log("Failed to write to database after $maxAttempts attempts");
     // Handle failure to write after maximum attempts
-} else {
-    // Successfully wrote to the database
-    echo "Successfully wrote to database";
-    echo "<br>";
 }
-
 
 
 $directoryPath = $sessionId;
@@ -554,16 +720,6 @@ VideoDownloadTask::setFolderId($sessionId);
 // Instantiate the VideoDownloadManager
 $downloadManager = new VideoDownloadManager();
 
-$urls = $_POST['title']; //liste des urls
-$formats = $_POST['format']; //format pour chaque url
-$timers = $_POST['posTimer']; //récupère les sections debut et fin
-$selectedElements = $_POST['selectedElements']; //récupère les liens concernés par un timer
-$rename = $_POST['rename']; //if multiple files specified name for renaming tar containing files
-if (!$rename) {
-    $rename = $sessionId;
-}
-$ordre = $_POST['ordre']; //garder l'ordre ou non
-
 
 
 
@@ -573,7 +729,6 @@ deleteDuplicateUrls($urls, $formats, $selectedElements, $timers);
 $length = count($urls);
 $ordre = ($length > 1) ? $ordre : false;
 $rename = ($length > 1) ? $rename : $sessionId;
-
 
 
 // Add tasks to the download manager and validations
@@ -622,9 +777,7 @@ $downloadManager->renameAndOrder($ordre);
 
 
 if ($downloadManager->getValidCount() > 1) {
-    $downloadManager->makeArchive($rename);
-    //$downloadManager->download($rename . '.tar');
-    $file = $rename . '.tar';
+    $file = $downloadManager->makeArchive($rename);
 } else {
     $firstFilename = $downloadManager->getFirstValidDownload();
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -632,15 +785,23 @@ if ($downloadManager->getValidCount() > 1) {
         $file = $firstFilename;
     }
 }
-echo $file;
+
+if ($file != null) {
 ?>
-<form action="finaldownload.php" method="get">
-    <input type="hidden" name="file" value="<?php echo htmlspecialchars($file); ?>">
-    <input type="submit" value="Telecharger">
+    <form action="finaldownload.php" method="get">
+        <input type="hidden" name="file" value="<?php echo htmlspecialchars($file); ?>">
+        <input type="submit" value="Telecharger">
+    </form>
+<?php
+} else {
+    echo '<br>';
+    echo 'Aucun téléchargement disponible, il y a eu une erreur.';
+}
+?>
+<form action="newurl.php">
+    <button type="submit">Retour</button>
 </form>
 <?php
-
-//$downloadManager->deleteFiles($rename);
 
 
 // Flush output to make sure any progress messages are sent to the client
@@ -648,13 +809,8 @@ flush();
 // Terminate script execution
 exit;
 /*
-problème ordre qui s'affiche pas
-pouvoir ajouter plusieurs liens simultanément
-problème 2 cases à cocher qui s'affichent
-cacher timer si playlist
 progressbar
 tuto en bas + FAQ
 night mode
 */
 ?>
-<a href="url.php"> retour </a>

@@ -62,7 +62,7 @@ function deleteDirectory($dir) {
 }
 
 $currentTime = time();
-$expireTime = 600; // 90 minutes in seconds
+$expireTime = 300; // 90 minutes in seconds
 
 writeToLog("Cleanup script started.");
 
@@ -78,8 +78,6 @@ try {
         writeToLog("Time difference: " . ($currentTime - $creationTime));
 
         if (($currentTime - $creationTime) > $expireTime) {
-            $tarFile = "/var/www/html/YoutubeDL/$sessionId.tar";
-
             // Delete session directory
             if (is_dir($sessionDir)) {
                 if (deleteDirectory($sessionDir)) {
@@ -89,17 +87,6 @@ try {
                 }
             } else {
                 writeToLog("Session directory does not exist: $sessionDir");
-            }
-
-            // Delete tar file if it exists
-            if (file_exists($tarFile)) {
-                if (unlink($tarFile)) {
-                    writeToLog("Deleted tar file: $tarFile");
-                } else {
-                    writeToLog("Failed to delete tar file: $tarFile. Error: " . error_get_last()['message']);
-                }
-            } else {
-                writeToLog("Tar file does not exist: $tarFile");
             }
 
             // Remove entry from the database

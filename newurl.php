@@ -52,6 +52,23 @@
                 <option value="webm" data-icon="fa-solid fa-video">webm</option>
             </select>
         </div>
+        <select id="numberDropdownAdd" onchange="addMultipleRows()">
+            <!-- Values from 1 to 10 -->
+            <option value="" disabled selected>Select a number</option>
+            <script>
+                // Populate the dropdown with values from 1 to 10
+                for (let i = 1; i <= 50; i++) {
+                    const option = document.createElement("option");
+                    option.value = i;
+                    option.text = i;
+                    document.getElementById("numberDropdownAdd").appendChild(option);
+                }
+            </script>
+        </select>
+        <select id="numberDropdownDelete" onchange="deleteMultipleRows()">
+            <!-- Values from 1 to 10 -->
+            <option value="" disabled selected>Select a number</option>
+        </select>
         <form id="form" action="newdownload.php" method="post" style="margin-top: 15px; margin-left: 15px;">
             <div id="inputFormRowOff">
                 <div class="input-group mb-3">
@@ -117,6 +134,27 @@
 </html>
 
 <script type="text/javascript">
+    function addMultipleRows() {
+        // Get the selected value
+        const selectedValue = document.getElementById("numberDropdownAdd").value;
+        // Display the selected value
+        for (let i = 0; i < selectedValue; i++) {
+            addRow();
+        }
+    }
+
+    function deleteMultipleRows() {
+        // Get the selected value
+        const selectedValue = document.getElementById("numberDropdownDelete").value;
+        // Display the selected value
+        for (let i = 0; i < selectedValue; i++) {
+            deleteMultipleRowsFunction();
+        }
+    }
+
+
+
+    let countRows = 1;
     $(document).ready(function() {
         function formatOption(option) {
             if (!option.id) {
@@ -161,7 +199,7 @@
                 return false; // Exit the loop early if at least one is checked
             }
         });
-        if ($("#inputFormRow").length == 0 && anyChecked == true) {
+        if ($(".inputFormRow").length == 0 && anyChecked == true) {
 
         }
         console.log(anyChecked);
@@ -184,9 +222,14 @@
                 const inputValue = inputElement.value.toLowerCase();
                 const containsList = inputValue.includes('list=');
                 const closest = inputElement.closest('.input-group');
+                const timerHide = closest.querySelector('.timerSelect');
+
 
                 if (containsList) {
                     console.log("'list=' detected in the input:", inputValue);
+
+                    timerHide.style.visibility = 'hidden';
+                    timerHide.style.width = '0';
 
                     // Create the checkbox element
                     const checkboxElement = document.createElement('input');
@@ -201,22 +244,34 @@
                         // Step 3: Define the function to be called when the checkbox changes
                         if (checkboxElement.checked) {
                             $("#ordrediv").css("display", "block");
-
+                            timerHide.style.visibility = 'hidden';
+                            timerHide.style.width = '0';
                             // Do something when the checkbox is checked
                         } else {
+                            timerHide.style.visibility = '';
+                            timerHide.style.width = '';
                             if (!isPlaylistActive()) {
                                 console.log("unchecking");
-                                $("#ordrediv").css("display", "none");
-                                $('#ordre').prop('checked', false);
+                                if (countRows == 1) {
+                                    $("#ordrediv").css("display", "none");
+                                    $('#ordre').prop('checked', false);
+                                }
                             }
                             // Do something when the checkbox is unchecked
                         }
                     });
 
                     // Insert the checkbox before the second child of the closest element
-                    closest.insertBefore(checkboxElement, closest.children[1]);
+                    const existingCheckbox = closest.querySelector('.playlistcheckbox');
+                    if (!existingCheckbox) {
+                        closest.insertBefore(checkboxElement, closest.children[1]);
+                    }
                 } else {
                     console.log("not detected");
+
+                    timerHide.style.visibility = '';
+                    timerHide.style.width = '';
+
                     // Check if there's already a checkbox present
                     const existingCheckbox = closest.querySelector('.playlistcheckbox');
                     if (existingCheckbox) {
@@ -224,7 +279,7 @@
                     }
                     if (!isPlaylistActive()) {
                         console.log("replacing with non playlist url");
-                        if ($("#inputFormRow").length == 0) {
+                        if ($(".inputFormRow").length == 0) {
                             $("#ordrediv").css("display", "none");
                             $('#ordre').prop('checked', false);
                         }
@@ -236,29 +291,33 @@
 
     detectPlaylist();
 
-    // add row
-    $("#addRow").click(function() {
+    function addRow() {
+        const option = document.createElement("option");
+        option.value = countRows;
+        option.text = countRows;
+        document.getElementById("numberDropdownDelete").appendChild(option);
+        countRows++;
         var html = '';
-        html += '<div id="inputFormRow">';
+        html += '<div class="inputFormRow">';
         html += '<div class="input-group mb-3">';
         html += '<input type="text" name="title[]" class="form-control m-input" placeholder="Copiez un lien ici" autocomplete="off" required>';
 
         html += '<select class="format-dropdown" name="format[]" style="width: 150px">' +
             '<option value="besta" data-icon="fa-solid fa-music">automatique</option>' +
-            '<option value="aac" data-icon="fa-solid fa-music">aac (a)</option>' +
-            '<option value="flac" data-icon="fa-solid fa-music">flac (a)</option>' +
-            '<option value="mp3" data-icon="fa-solid fa-music">mp3 (a)</option>' +
-            '<option value="m4a" data-icon="fa-solid fa-music">m4a (a)</option>' +
-            '<option value="opus" data-icon="fa-solid fa-music">opus (a)</option>' +
-            '<option value="vorbis" data-icon="fa-solid fa-music">vorbis (a)</option>' +
-            '<option value="wav" data-icon="fa-solid fa-music">wav (a)</option>' +
+            '<option value="aac" data-icon="fa-solid fa-music">aac</option>' +
+            '<option value="flac" data-icon="fa-solid fa-music">flac</option>' +
+            '<option value="mp3" data-icon="fa-solid fa-music">mp3</option>' +
+            '<option value="m4a" data-icon="fa-solid fa-music">m4a</option>' +
+            '<option value="opus" data-icon="fa-solid fa-music">opus</option>' +
+            '<option value="vorbis" data-icon="fa-solid fa-music">vorbis</option>' +
+            '<option value="wav" data-icon="fa-solid fa-music">wav</option>' +
             '<option value="bestv" data-icon="fa-solid fa-video">automatique</option>' +
-            '<option value="3gp" data-icon="fa-solid fa-video">3gp (v)</option>' +
-            '<option value="aac" data-icon="fa-solid fa-video">aac (v)</option>' +
-            '<option value="flv" data-icon="fa-solid fa-video">flv (v)</option>' +
-            '<option value="mp4" data-icon="fa-solid fa-video">mp4 (v)</option>' +
-            '<option value="ogg" data-icon="fa-solid fa-video">ogg (v)</option>' +
-            '<option value="webm" data-icon="fa-solid fa-video">webm (v)</option>' +
+            '<option value="3gp" data-icon="fa-solid fa-video">3gp</option>' +
+            '<option value="aac" data-icon="fa-solid fa-video">aac</option>' +
+            '<option value="flv" data-icon="fa-solid fa-video">flv</option>' +
+            '<option value="mp4" data-icon="fa-solid fa-video">mp4</option>' +
+            '<option value="ogg" data-icon="fa-solid fa-video">ogg</option>' +
+            '<option value="webm" data-icon="fa-solid fa-video">webm</option>' +
             '</select>';
         html += '<div class="timerSelect"><img class="timer" src="img/timer.jpg" alt="Timer"></div>';
         html += '<div class="input-group-append">';
@@ -289,12 +348,37 @@
         $("#rename").attr("placeholder", "Renommez le dossier qui contiendra les téléchargements");
         $("#ordrediv").css("display", "block");
         detectPlaylist();
+    }
+
+    function deleteMultipleRowsFunction() {
+        countRows--;
+        $('.inputFormRow').last().remove();
+        if ($(".inputFormRow").length == 0) {
+            console.log($(".inputFormRow").length);
+            $("#renamediv").css("display", "none");
+            $("#rename").attr("placeholder", "");
+            $("#rename").val('');
+            if (!isPlaylistActive()) {
+                console.log("deleting last row");
+                $("#ordrediv").css("display", "none");
+                $('#ordre').prop('checked', false);
+            }
+        }
+        document.getElementById("numberDropdownDelete").lastElementChild.remove();
+    }
+
+
+    // add row
+    $("#addRow").click(function() {
+        addRow();
     });
 
     // remove row
     $(document).on('click', '#removeRow', function() {
-        $(this).closest('#inputFormRow').remove();
-        if ($("#inputFormRow").length == 0) {
+        countRows--;
+        $(this).closest('.inputFormRow').remove();
+        if ($(".inputFormRow").length == 0) {
+            console.log($(".inputFormRow").length);
             $("#renamediv").css("display", "none");
             $("#rename").attr("placeholder", "");
             $("#rename").val('');
@@ -307,8 +391,8 @@
     });
 
     $("#reinit").click(function() {
-        while ($("#inputFormRow").length != 0) {
-            $('#inputFormRow').remove();
+        while ($(".inputFormRow").length != 0) {
+            $('.inputFormRow').remove();
         }
         $('.form-control').val('');
         $("#renamediv").css("display", "none");
